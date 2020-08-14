@@ -45,23 +45,21 @@ max(ymd("2020-09-23","2020-10-12","2019-12-30"))
 
 # Accuracy of Hawkes Projections
 
-## Single Forecast Visualization
-
-Sample single forecast visulizations.
-
-```{r}
-multi_forecast("2018-08-27",c(15,24,31)) #shows predicted vs actual for one forecast
-multi_forecast("2018-09-27",c(10,18,27)) #shows predicted vs actual for one forecast
-```
-
-\pagebreak
-
 ## Single Forecast Visualization for Entire Outbreak
 
 Shows predicted vs actual for one forecast with respect to entire outbreak.
 
 ```{r}
 full_forecast("2018-10-31",c(15,28,42)) 
+```
+
+## Single Forecast Visualization
+
+Shows predicted vs actual for one forecast with respect to that date range.
+
+```{r}
+multi_forecast("2018-08-27",c(15,24,31)) #shows predicted vs actual for one forecast
+multi_forecast("2018-09-27",c(10,18,27)) #shows predicted vs actual for one forecast
 ```
 
 \pagebreak

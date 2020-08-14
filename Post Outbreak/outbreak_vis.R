@@ -67,6 +67,7 @@ multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
+  min_date <- min(ymd(date_vec)) #latest date using lubridate
   date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
   forc_dates <- lapply(date_vecl, add_weeks) # add c(7,14,21) days to each date
   l2 <- length(forc_dates)
@@ -87,7 +88,7 @@ multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
   df <- data.frame(dfdate, forecast_total, Prediction) # data frame for ggplot
 
   g <- ggplot(
-    data = true[true$date < as.Date(max_date) + 28,],
+    data = true[(true$date < as.Date(max_date) + 28) & (true$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
@@ -120,6 +121,7 @@ add_21 <- function(x) {x + 21} #adding a 7 day forecast
 single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
+  min_date <- min(ymd(date_vec)) #latest date using lubridate
   date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
   
   if(days == 7) {
@@ -154,7 +156,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
   df <- data.frame(dfdate, forecast_total) # data frame for ggplot
   
   g <- ggplot(
-    data = true[true$date < as.Date(max_date) + 28,],
+    data = true[(true$date < as.Date(max_date) + 28) & (true$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
