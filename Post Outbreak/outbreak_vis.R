@@ -14,7 +14,7 @@ full_forecast <- function(rdate, forecast) {
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   df <- data.frame(Prediction, forecast)
   
-  corresp_total <- true$total[true$date==as.Date(rdate)] # running total on that date
+  corresp_total <- true$total[true$date == as.Date(rdate)] # running total on that date
   
   p + geom_point(data = df, 
                  mapping = aes(as.Date(rdate)+c(7,14,21),
@@ -32,7 +32,7 @@ full_forecast <- function(rdate, forecast) {
 plot_forecast <- function(rdate, forecast) {
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   df <- data.frame(Prediction, forecast)
-  corresp_total <- true$total[true$date==as.Date(rdate)] # running total on that date
+  corresp_total <- true$total[true$date == as.Date(rdate)] # running total on that date
   g <- ggplot(
     data = true[true$date < as.Date(rdate) + 28,], #an extra week past the last day for readability
     mapping = aes(x = date, y = total)
