@@ -171,7 +171,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
   } #generating cumulative case counts for each desired day
   
   forecast_total <- forecast_vec + total_vec # adding forecasted values to cumulative totals
-  # this recycles, so order is very important here!!!
+  # this recycles, so order is very important here!
   df <- data.frame(dfdate, forecast_total) # data frame for ggplot
   
   g <- ggplot(
@@ -181,7 +181,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
     geom_line() + 
     theme_light() + 
     geom_vline(xintercept = as.Date(date_vec), col = "navy") #line at the dates
-  #return(g)
+
   g + geom_point(
     data = df,
     mapping = aes(
