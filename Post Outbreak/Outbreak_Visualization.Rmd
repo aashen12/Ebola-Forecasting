@@ -10,8 +10,9 @@ output: pdf_document
 rm(list=ls())
 library(tidyverse)
 library(lubridate)
+final_index <- 733 #last row with a date or anything useful
 true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
-true <- true[1:733,]
+true <- true[1:final_index,] #the final_index might be changed
 colnames(true) <- c("date", "cases")
 true$date <- mdy(true$date)
 true$cases[is.na(true$cases)] <- 0

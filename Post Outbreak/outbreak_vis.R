@@ -1,6 +1,10 @@
 # Functions to visualize Hawkes predictions vs. actual Ebola outbreak results
 ## Andy Shen, Sarita Lee, Frederic Schoenberg
 ## UCLA Department of Statistics
+
+library(tidyverse)
+library(lubridate)
+
 ######################################################################################################################
 
 ## The full_forecast function plots the result from a single Hawkes forecast 
@@ -56,30 +60,31 @@ plot_forecast <- function(rdate, forecast) {
 ## This function can do the same thing as plot_forecast(), but is also optimized to plot 
 ## multiple forecasts.
 
-add_weeks <- function(x) x + c(7,14,21)
+add_weeks <- function(x) {x + c(7,14,21)}
 
 multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   l <- length(date_vec)
-  max_date <- max(ymd(date_vec))
-  date_vecl <- as.list(as.Date(date_vec))
-  forc_dates <- lapply(date_vecl, add_weeks)
+  max_date <- max(ymd(date_vec)) #latest date using lubridate
+  date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
+  forc_dates <- lapply(date_vecl, add_weeks) # add c(7,14,21) days to each date
   l2 <- length(forc_dates)
   date_list <- c()
   for(i in 1:l2) {
-    date_list <- c(date_list,as.list(forc_dates[[i]]))
-  }
-  dfdate <- t(data.frame(date_list))
+    date_list <- c(date_list,as.list(forc_dates[[i]])) 
+    #group all dates into their own list
+  } 
+  dfdate <- t(data.frame(date_list)) #data.frame to preserve date structure
   
   total_vec <- rep(NA, l)
   for(i in seq_len(l)) {
     total_vec[i] <- true$total[true$date == as.Date(date_vec[i])]
-  } #generating totals for that day
+  } #generating cumulative case counts for each desired day
   
-  forecast_total <- t(t(forecast_mat) + total_vec)
+  forecast_total <- t(t(forecast_mat) + total_vec) # adding forecasted values to cumulative totals
   forecast_total <- as.vector(forecast_total)
-  df <- data.frame(dfdate, forecast_total, Prediction)
-  #browser()
+  df <- data.frame(dfdate, forecast_total, Prediction) # data frame for ggplot
+
   g <- ggplot(
     data = true[true$date < as.Date(max_date) + 28,],
     mapping = aes(x = date, y = total)
