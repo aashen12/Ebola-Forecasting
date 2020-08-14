@@ -10,7 +10,7 @@ output: pdf_document
 rm(list=ls())
 library(tidyverse)
 library(lubridate)
-final_index <- 733 #last row with a date or anything useful
+final_index <- 733 #last row with a date or any information
 true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
 true <- true[1:final_index,] #the final_index might be changed
 colnames(true) <- c("date", "cases")
@@ -35,7 +35,7 @@ plot(true$date, true$total, type = "l", lwd = 3,
 source("outbreak_vis.R")
 p <- ggplot(data = true, 
             mapping = aes(x = date, y = total)) + 
-  geom_line() + theme_light() # grapho of runinng total of cases
+  geom_line() + theme_light() # graph of runinng total of cases
 
 p + labs(title = "Actual Recorded DRC Ebola Cases")
 max(ymd("2020-09-23","2020-10-12","2019-12-30"))
@@ -62,7 +62,6 @@ Shows predicted vs actual for one forecast with respect to entire outbreak.
 
 ```{r}
 full_forecast("2018-10-31",c(15,28,42)) 
-
 ```
 
 \pagebreak
@@ -78,10 +77,30 @@ mt <- cbind(c(15,24,31),c(10,18,27),c(15,28,42),c(15,29,41),c(21,40,60))
 multi_forecast(dv, mt, title = title)
 ```
 
+\pagebreak
+
+## 2018 7-day Forecasts
+
+```{r}
+title <- "7-Day Forecasts vs Actual in 2018"
+single_forecast(dv, mt, days = 7, title = title)
+```
+
+\pagebreak
+
+## 2018 14-day Forecasts
+
+```{r}
+title <- "14-Day Forecasts vs Actual in 2018"
+single_forecast(dv, mt, days = 14, title = title)
+```
 
 
+\pagebreak
 
+## 2018 21-day Forecasts
 
-
-
-
+```{r}
+title <- "21-Day Forecasts vs Actual in 2018"
+single_forecast(dv, mt, days = 21, title = title)
+```

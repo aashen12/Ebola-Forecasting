@@ -106,3 +106,68 @@ multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
 }
 
 ######################################################################################################################
+
+## Function that accepts a vector of dates (date_vec) and 
+## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat).
+## The same inputs as multi_forecast().
+## But it returns the x-day forecasts for all dates specified, where x is either
+## the 7, 14 or 21-day forecast.
+
+add_7 <- function(x) {x + 7} #adding a 7 day forecast
+add_14 <- function(x) {x + 14} #adding a 7 day forecast
+add_21 <- function(x) {x + 21} #adding a 7 day forecast
+
+single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
+  l <- length(date_vec)
+  max_date <- max(ymd(date_vec)) #latest date using lubridate
+  date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
+  
+  if(days == 7) {
+    forecast_vec <- forecast_mat[1,] # 7 day projections
+    forc_dates <- lapply(date_vecl, add_7) # add 7 days to each date
+    col <- "blue"
+  } else if(days == 14) {
+    forecast_vec <- forecast_mat[2,] # 14 day projections
+    forc_dates <- lapply(date_vecl, add_14) # add 14 days to each date
+    col <- "red"
+  } else {
+    forecast_vec <- forecast_mat[3,] # 21 day projections
+    forc_dates <- lapply(date_vecl, add_21) # add 21 days to each date
+    col <- "green"
+  }
+  
+  l2 <- length(forc_dates)
+  date_list <- c()
+  for(i in 1:l2) {
+    date_list <- c(date_list,as.list(forc_dates[[i]])) 
+    #group all dates into their own list
+  } 
+  dfdate <- t(data.frame(date_list)) #data.frame to preserve date structure
+  
+  total_vec <- rep(NA, l)
+  for(i in seq_len(l)) {
+    total_vec[i] <- true$total[true$date == as.Date(date_vec[i])]
+  } #generating cumulative case counts for each desired day
+  
+  forecast_total <- forecast_vec + total_vec # adding forecasted values to cumulative totals
+  # this recycles, so order is very important here!!!
+  df <- data.frame(dfdate, forecast_total) # data frame for ggplot
+  
+  g <- ggplot(
+    data = true[true$date < as.Date(max_date) + 28,],
+    mapping = aes(x = date, y = total)
+  ) + 
+    geom_line() + 
+    theme_light() + 
+    geom_vline(xintercept = as.Date(date_vec), col = "navy") #line at the dates
+  #return(g)
+  g + geom_point(
+    data = df,
+    mapping = aes(
+      x = as.Date(dfdate),
+      y = forecast_total,
+    ),
+    color = col,
+    size = 2.3
+  ) + theme(legend.position = "bottom") + labs(title = title)
+}
