@@ -192,3 +192,4 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
     size = 2.7
   ) + theme(legend.position = "bottom") + labs(title = title)
 }
+######################################################################################################################
