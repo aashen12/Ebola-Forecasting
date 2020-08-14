@@ -1,0 +1,83 @@
+---
+title: "Ebola Forecasting Analysis"
+author: "Andy Shen"
+date: "8/13/2020"
+output: pdf_document
+---
+
+
+```{r, include=FALSE}
+rm(list=ls())
+library(tidyverse)
+library(lubridate)
+true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
+true <- true[1:733,]
+colnames(true) <- c("date", "cases")
+true$date <- mdy(true$date)
+true$cases[is.na(true$cases)] <- 0
+true <- true %>% mutate(total = cumsum(cases))
+last_date <- true$date[length(true$date)]
+last_case <- true$total[length(true$total)]
+```
+
+
+
+# Actual Recorded DRC Ebola Cases
+
+```{r,include=FALSE}
+plot(true$date, true$total, type = "l", lwd = 3,
+     xlab = "Date", ylab = "Total Cases",
+     main = "Actual Recorded DRC Ebola Cases")
+```
+
+```{r}
+p <- ggplot(data = true, 
+            mapping = aes(x = date, y = total)) + 
+  geom_line() + theme_light() # grapho of runinng total of cases
+
+p + labs(title = "Actual Recorded DRC Ebola Cases")
+max(ymd("2020-09-23","2020-10-12","2019-12-30"))
+```
+
+\pagebreak
+
+# Accuracy of Hawkes Projections
+
+## Forecast Projections
+
+```{r}
+source("outbreak_vis.R")
+
+dv <- c("2018-08-27","2018-09-27","2018-10-31")
+mt <- cbind(c(15,24,31),c(10,18,27),c(15,28,42))
+multi_forecast(dv, mt, title = "Forecasts vs Actual") #shows predicted vs actual for three forecasts
+
+multi_forecast("2018-08-27",c(15,24,31)) #shows predicted vs actual for one forecast
+multi_forecast("2018-09-27",c(10,18,27)) #shows predicted vs actual for one forecast
+```
+
+```{r}
+full_forecast("2018-10-31",c(15,28,42)) 
+#shows predicted vs actual for one forecast wrt entire outbreak
+```
+
+
+
+
+```{r}
+add<-function(x) x + c(7,14,21)
+dv<-c("2018-08-27","2018-09-27")
+dv<-as.list(as.Date(dv)) 
+l <- lapply(dv,add)
+l 
+t(data.frame(l))[1,1]
+v<-c()
+for(i in 1:length(l)){
+  v<-c(v,as.list(l[[i]]))
+}
+data.frame(t(data.frame(v)), 8)
+```
+
+
+
+
