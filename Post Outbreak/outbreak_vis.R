@@ -54,8 +54,7 @@ plot_forecast <- function(rdate, forecast) {
       col = Prediction
     ),
     size = 2.3
-  ) + 
-  theme(legend.position = "bottom")
+  ) + theme(legend.position = "bottom")
 }
 
 ######################################################################################################################
@@ -137,7 +136,7 @@ add_21 <- function(x) {x + 21} #adding a 7 day forecast
 ## the Hawkes model projections for that indicated day.
 
 single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
-  
+  size <- 3.2
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
   min_date <- min(ymd(date_vec)) #latest date using lubridate
@@ -189,7 +188,13 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
       y = forecast_total,
     ),
     color = col,
-    size = 2.7
-  ) + theme(legend.position = "bottom") + labs(title = title)
+    size = size
+  ) + theme(legend.position = "bottom") + labs(title = title) +
+    geom_path(
+      data = df,
+      aes(x = as.Date(dfdate), y = forecast_total),
+      color = col,
+      size = size - 2.2
+    )
 }
 ######################################################################################################################
