@@ -2,6 +2,7 @@
 ## Andy Shen, Sarita Lee, Frederic Schoenberg
 ## UCLA Department of Statistics
 ######################################################################################################################
+
 ## The full_forecast function plots the result from a single Hawkes forecast 
 ## with respect to the entire outbreak.
 
@@ -19,8 +20,10 @@ full_forecast <- function(rdate, forecast) {
 
 ######################################################################################################################
 
-## The full_forecast function plots the result from a single Hawkes forecast with respect to the cases 
+## The plot_forecast function plots the result from a single Hawkes forecast with respect to the cases 
 ## up to the forecasted days.
+
+### THIS FUNCTION IS OBSOLETE. USE multi_forecast() INSTEAD ###
 
 plot_forecast <- function(rdate, forecast) {
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
