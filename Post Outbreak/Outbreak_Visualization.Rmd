@@ -31,6 +31,7 @@ plot(true$date, true$total, type = "l", lwd = 3,
 ```
 
 ```{r}
+source("outbreak_vis.R")
 p <- ggplot(data = true, 
             mapping = aes(x = date, y = total)) + 
   geom_line() + theme_light() # grapho of runinng total of cases
@@ -43,23 +44,40 @@ max(ymd("2020-09-23","2020-10-12","2019-12-30"))
 
 # Accuracy of Hawkes Projections
 
-## Forecast Projections
+## Single Forecast Visualization
+
+Sample single forecast visulizations.
 
 ```{r}
-source("outbreak_vis.R")
-
-dv <- c("2018-08-27","2018-09-27","2018-10-31")
-mt <- cbind(c(15,24,31),c(10,18,27),c(15,28,42))
-multi_forecast(dv, mt, title = "Forecasts vs Actual") #shows predicted vs actual for three forecasts
-
 multi_forecast("2018-08-27",c(15,24,31)) #shows predicted vs actual for one forecast
 multi_forecast("2018-09-27",c(10,18,27)) #shows predicted vs actual for one forecast
 ```
 
+\pagebreak
+
+## Single Forecast Visualization for Entire Outbreak
+
+Shows predicted vs actual for one forecast with respect to entire outbreak.
+
 ```{r}
 full_forecast("2018-10-31",c(15,28,42)) 
-#shows predicted vs actual for one forecast wrt entire outbreak
+
 ```
+
+\pagebreak
+
+## Forecasts vs Actual in 2018
+
+Monthly forecasts during all available data in 2018.
+
+```{r}
+title <- "Forecasts vs Actual in 2018"
+dv <- c("2018-08-27","2018-09-27","2018-10-31","2018-11-29","2018-12-30")
+mt <- cbind(c(15,24,31),c(10,18,27),c(15,28,42),c(15,29,41),c(21,40,60))
+multi_forecast(dv, mt, title = title)
+```
+
+
 
 
 
