@@ -25,7 +25,7 @@ full_forecast <- function(rdate, forecast) {
 ######################################################################################################################
 
 ## The plot_forecast function plots the result from a single Hawkes forecast with respect to the cases 
-## up to the forecasted days.
+## up to the forecasted days +/- 28.
 
 ### THIS FUNCTION IS OBSOLETE. USE multi_forecast() INSTEAD ###
 
@@ -61,7 +61,10 @@ plot_forecast <- function(rdate, forecast) {
 ## This function can do the same thing as plot_forecast() and return the results from one forecast, 
 ## but is also optimized to plot multiple forecasts.
 
-add_weeks <- function(x) {x + c(7,14,21)}
+## NOTE: if you are just visualizing a single forecast, you DO NOT 
+## need to cbind() your projections, just the vector is enough.
+
+add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 
 multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
@@ -108,15 +111,16 @@ multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
 
 ######################################################################################################################
 
+add_7 <- function(x) {x + 7} #adding a 7 day forecast
+add_14 <- function(x) {x + 14} #adding a 7 day forecast
+add_21 <- function(x) {x + 21} #adding a 7 day forecast
+
 ## Function that accepts a vector of dates (date_vec) and 
 ## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat).
 ## The same inputs as multi_forecast().
 ## But it returns the x-day forecasts for all dates specified, where x is either
 ## the 7, 14 or 21-day forecast.
 
-add_7 <- function(x) {x + 7} #adding a 7 day forecast
-add_14 <- function(x) {x + 14} #adding a 7 day forecast
-add_21 <- function(x) {x + 21} #adding a 7 day forecast
 
 single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
   l <- length(date_vec)

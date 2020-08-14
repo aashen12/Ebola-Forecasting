@@ -5,11 +5,11 @@ date: "8/13/2020"
 output: pdf_document
 ---
 
+# Data Input and Cleaning
 
-```{r, include=FALSE}
+```{r}
 rm(list=ls())
-library(tidyverse)
-library(lubridate)
+source("outbreak_vis.R")
 final_index <- 733 #last row with a date or any information
 true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
 true <- true[1:final_index,] #the final_index might be changed
@@ -21,7 +21,7 @@ last_date <- true$date[length(true$date)]
 last_case <- true$total[length(true$total)]
 ```
 
-
+\pagebreak
 
 # Actual Recorded DRC Ebola Cases
 
@@ -32,7 +32,6 @@ plot(true$date, true$total, type = "l", lwd = 3,
 ```
 
 ```{r}
-source("outbreak_vis.R")
 p <- ggplot(data = true, 
             mapping = aes(x = date, y = total)) + 
   geom_line() + theme_light() # graph of runinng total of cases
