@@ -1,2 +1,2 @@
 # Ebola-Forecasting
-Code and scripts for UCLA Department of Statistics Ebola Forecasting Research Group
+Code and documents for UCLA Department of Statistics Ebola Forecasting Research Group.
