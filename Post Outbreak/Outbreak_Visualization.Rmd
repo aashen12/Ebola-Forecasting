@@ -64,20 +64,5 @@ full_forecast("2018-10-31",c(15,28,42))
 
 
 
-```{r}
-add<-function(x) x + c(7,14,21)
-dv<-c("2018-08-27","2018-09-27")
-dv<-as.list(as.Date(dv)) 
-l <- lapply(dv,add)
-l 
-t(data.frame(l))[1,1]
-v<-c()
-for(i in 1:length(l)){
-  v<-c(v,as.list(l[[i]]))
-}
-data.frame(t(data.frame(v)), 8)
-```
-
-
 
 
