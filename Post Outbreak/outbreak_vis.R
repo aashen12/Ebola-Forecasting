@@ -1,5 +1,7 @@
 # Functions to visualize Hawkes predictions vs. actual Ebola outbreak results
-
+## Andy Shen, Sarita Lee, Frederic Schoenberg
+## UCLA Department of Statistics
+######################################################################################################################
 ## The full_forecast function plots the result from a single Hawkes forecast 
 ## with respect to the entire outbreak.
 
