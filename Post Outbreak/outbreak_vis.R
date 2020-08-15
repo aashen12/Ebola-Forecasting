@@ -157,9 +157,9 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
   }
   
   l2 <- length(forc_dates)
-  date_list <- c()
+  date_list <- rep(NA, l2)
   for(i in 1:l2) {
-    date_list <- c(date_list,as.list(forc_dates[[i]])) 
+    date_list[i] <- as.list(forc_dates[[i]])
     #group all dates into their own list
   } 
   dfdate <- t(data.frame(date_list)) #data.frame to preserve date structure
