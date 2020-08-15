@@ -5,10 +5,18 @@
 library(tidyverse)
 library(lubridate)
 
+add_7 <- function(x) {x + 7} #adding a 7 day forecast
+add_14 <- function(x) {x + 14} #adding a 14 day forecast
+add_21 <- function(x) {x + 21} #adding a 21 day forecast
+add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
+
+
 ######################################################################################################################
 
 ## The full_forecast function plots the result from a single Hawkes forecast 
 ## with respect to the entire outbreak.
+
+## This function requires the ggplot() object p to be declared
 
 full_forecast <- function(rdate, forecast) {
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
@@ -34,12 +42,12 @@ full_forecast <- function(rdate, forecast) {
 
 ### THIS FUNCTION IS OBSOLETE. USE multi_forecast() INSTEAD ###
 
-plot_forecast <- function(rdate, forecast) {
+plot_forecast <- function(rdate, forecast, data = true) {
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   df <- data.frame(Prediction, forecast)
-  corresp_total <- true$total[true$date == as.Date(rdate)] # running total on that date
+  corresp_total <- data$total[data$date == as.Date(rdate)] # running total on that date
   g <- ggplot(
-    data = true[true$date < as.Date(rdate) + 28,], #an extra week past the last day for readability
+    data = data[data$date < as.Date(rdate) + 28,], #an extra week past the last day for readability
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
@@ -71,9 +79,7 @@ plot_forecast <- function(rdate, forecast) {
 ## NOTE: if you are just visualizing a single forecast, you DO NOT 
 ## need to cbind() your projections, just the vector is enough.
 
-add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
-
-multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
+multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
   
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   
@@ -93,7 +99,7 @@ multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
   
   total_vec <- rep(NA, l)
   for(i in seq_len(l)) {
-    total_vec[i] <- true$total[true$date == as.Date(date_vec[i])]
+    total_vec[i] <- data$total[data$date == as.Date(date_vec[i])]
   } #generating cumulative case counts for each desired day
   
   forecast_total <- t(t(forecast_mat) + total_vec) # adding forecasted values to cumulative totals
@@ -101,7 +107,7 @@ multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
   df <- data.frame(dfdate, forecast_total, Prediction) # data frame for ggplot
 
   g <- ggplot(
-    data = true[(true$date < as.Date(max_date) + 28) & (true$date > as.Date(min_date) - 14),],
+    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
@@ -121,13 +127,11 @@ multi_forecast <- function(date_vec, forecast_mat, title = NULL) {
 
 ######################################################################################################################
 
-add_7 <- function(x) {x + 7} #adding a 7 day forecast
-add_14 <- function(x) {x + 14} #adding a 7 day forecast
-add_21 <- function(x) {x + 21} #adding a 7 day forecast
-
 ## Function that accepts a vector of dates (date_vec) and 
 ## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
 ## as well as the number of forecasted days you want to visualize (days).
+## The data argument accepts a data frame with the corresponding data.
+## The res argument decides whether to output results along with a plot. Returns just the plot by default.
 ## The title argument is the title for the corresponding plot.
 ## The same inputs as multi_forecast().
 ## But it returns the x-day forecasts for all dates specified, where x is either
@@ -135,7 +139,7 @@ add_21 <- function(x) {x + 21} #adding a 7 day forecast
 ## The function returns a visualization of confirmed cases vs
 ## the Hawkes model projections for that indicated day.
 
-single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res = FALSE) {
+single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = FALSE) {
   size <- 3.2
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
@@ -166,7 +170,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
   
   total_vec <- rep(NA, l)
   for(i in seq_len(l)) {
-    total_vec[i] <- true$total[true$date == as.Date(date_vec[i])]
+    total_vec[i] <- data$total[data$date == as.Date(date_vec[i])]
   } #generating cumulative case counts for each desired day
   
   forecast_total <- forecast_vec + total_vec # adding forecasted values to cumulative totals
@@ -174,7 +178,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
   df <- data.frame(dfdate, forecast_total) # data frame for ggplot
   
   g <- ggplot(
-    data = true[(true$date < as.Date(max_date) + 28) & (true$date > as.Date(min_date) - 14),],
+    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
@@ -202,7 +206,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
       fdate <- as.Date(date_vec) + 7
       actual <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
-        actual[i] <- true$total[true$date == as.Date(fdate[i])]
+        actual[i] <- data$total[data$date == as.Date(fdate[i])]
       }
       
       df_show <- data.frame(
@@ -222,7 +226,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
       fdate <- as.Date(date_vec) + 14
       actual <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
-        actual[i] <- true$total[true$date == as.Date(fdate[i])]
+        actual[i] <- data$total[data$date == as.Date(fdate[i])]
       }
       
       df_show <- data.frame(
@@ -242,7 +246,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
       fdate <- as.Date(date_vec) + 21
       actual <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
-        actual[i] <- true$total[true$date == as.Date(fdate[i])]
+        actual[i] <- data$total[data$date == as.Date(fdate[i])]
       }
       
       df_show <- data.frame(
