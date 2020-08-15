@@ -135,7 +135,7 @@ add_21 <- function(x) {x + 21} #adding a 7 day forecast
 ## The function returns a visualization of confirmed cases vs
 ## the Hawkes model projections for that indicated day.
 
-single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
+single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res = FALSE) {
   size <- 3.2
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
@@ -179,22 +179,95 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL) {
   ) + 
     geom_line() + 
     theme_light() + 
-    geom_vline(xintercept = as.Date(date_vec), col = "navy") #line at the dates
-
-  g + geom_point(
-    data = df,
-    mapping = aes(
-      x = as.Date(dfdate),
-      y = forecast_total,
-    ),
-    color = col,
-    size = size
-  ) + theme(legend.position = "bottom") + labs(title = title) +
+    geom_vline(xintercept = as.Date(date_vec), col = "navy") +  #line at the dates  
+    geom_point(
+      data = df,
+      mapping = aes(
+        x = as.Date(dfdate),
+        y = forecast_total,
+      ),
+      color = col,
+      size = size
+      
+    ) + theme(legend.position = "bottom") + labs(title = title) +
     geom_path(
       data = df,
       aes(x = as.Date(dfdate), y = forecast_total),
       color = col,
       size = size - 2.2
     )
+ 
+  if(res == TRUE) {
+    
+    if(days == 7) {
+      
+      fdate <- as.Date(date_vec) + 7
+      actual <- rep(NA,length(fdate))
+      for(i in 1:length(fdate)) {
+        actual[i] <- true$total[true$date == as.Date(fdate[i])]
+      }
+      
+      df_show <- data.frame(
+        cbind(
+          date_vec,
+          total_vec,
+          dfdate,
+          total_vec + forecast_mat[1,],
+          actual
+        )
+      )
+      row.names(df_show) <- 1:nrow(df_show)
+      colnames(df_show) <- c("prior_date","prior total","forecast_date","forecast.total.7","actual.total.7")
+      
+    } 
+    
+    else if(days == 14) {
+      
+      fdate <- as.Date(date_vec) + 14
+      actual <- rep(NA,length(fdate))
+      for(i in 1:length(fdate)) {
+        actual[i] <- true$total[true$date == as.Date(fdate[i])]
+      }
+      
+      df_show <- data.frame(
+        cbind(
+          date_vec,
+          total_vec,
+          dfdate,
+          total_vec + forecast_mat[2,],
+          actual
+        )
+      )
+      row.names(df_show) <- 1:nrow(df_show)
+      colnames(df_show) <- c("prior_date","prior total","forecast_date","forecast.total.14","actual.total.14")
+      
+    }
+    
+    else {
+      fdate <- as.Date(date_vec) + 21
+      actual <- rep(NA,length(fdate))
+      for(i in 1:length(fdate)) {
+        actual[i] <- true$total[true$date == as.Date(fdate[i])]
+      }
+      
+      df_show <- data.frame(
+        cbind(
+          date_vec,
+          total_vec,
+          dfdate,
+          total_vec + forecast_mat[3,],
+          actual
+        )
+      )
+      row.names(df_show) <- 1:nrow(df_show)
+      colnames(df_show) <- c("prior_date","prior total","forecast_date","forecast.total.21","actual.total.21")
+    }
+    return(list(g, df_show))
+    
+  } 
+  
+  else{
+    return(g)
+  }
 }
 ######################################################################################################################

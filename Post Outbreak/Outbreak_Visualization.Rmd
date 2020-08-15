@@ -77,9 +77,10 @@ multi_forecast(dv, mt, title = title)
 
 ## 2018 7-day Forecasts
 
+
 ```{r}
 title <- "7-Day Forecasts vs Actual in 2018"
-single_forecast(dv, mt, days = 7, title = title)
+single_forecast(dv, mt, days = 7, title = title, res = TRUE)
 ```
 
 \pagebreak
@@ -88,7 +89,7 @@ single_forecast(dv, mt, days = 7, title = title)
 
 ```{r}
 title <- "14-Day Forecasts vs Actual in 2018"
-single_forecast(dv, mt, days = 14, title = title)
+single_forecast(dv, mt, days = 14, title = title, res = TRUE)
 ```
 
 
@@ -98,5 +99,5 @@ single_forecast(dv, mt, days = 14, title = title)
 
 ```{r}
 title <- "21-Day Forecasts vs Actual in 2018"
-single_forecast(dv, mt, days = 21, title = title)
+single_forecast(dv, mt, days = 21, title = title, res = TRUE)
 ```
