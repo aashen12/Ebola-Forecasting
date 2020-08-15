@@ -5,9 +5,9 @@
 library(tidyverse)
 library(lubridate)
 
-add_7 <- function(x) {x + 7} #adding a 7 day forecast
-add_14 <- function(x) {x + 14} #adding a 14 day forecast
-add_21 <- function(x) {x + 21} #adding a 21 day forecast
+add_7 <- function(x) {x + 7} #adding on 7 days
+add_14 <- function(x) {x + 14} #adding on 14 days
+add_21 <- function(x) {x + 21} #adding on 21 days
 add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 
 ######################################################################################################################
