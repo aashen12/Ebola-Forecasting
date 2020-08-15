@@ -10,9 +10,9 @@ output: pdf_document
 ```{r}
 rm(list=ls())
 source("outbreak_vis.R")
-final_index <- 733 #last row with a date or any information
+rgx <- "\\d{1,2}\\/\\d{1,2}\\/\\d{4}" #date structure regex
 true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
-true <- true[1:final_index,] #the final_index might be changed
+true <- true[str_detect(true$Date, rgx),] #omits rows without a date
 colnames(true) <- c("date", "cases")
 true$date <- mdy(true$date)
 true$cases[is.na(true$cases)] <- 0
