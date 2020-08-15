@@ -198,7 +198,6 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
     )
  
   if(res == TRUE) {
-    
     if(days == 7) {
       
       fdate <- as.Date(date_vec) + 7
@@ -220,7 +219,6 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
       colnames(df_show) <- c("prior_date","prior total","forecast_date","forecast.total.7","actual.total.7")
       
     } 
-    
     else if(days == 14) {
       
       fdate <- as.Date(date_vec) + 14
@@ -242,7 +240,6 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
       colnames(df_show) <- c("prior_date","prior total","forecast_date","forecast.total.14","actual.total.14")
       
     }
-    
     else {
       fdate <- as.Date(date_vec) + 21
       actual <- rep(NA,length(fdate))
