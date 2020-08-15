@@ -264,7 +264,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
     
   } 
   
-  else{
+  else {
     return(g)
   }
 }
