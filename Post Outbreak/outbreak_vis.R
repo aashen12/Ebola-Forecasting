@@ -77,7 +77,7 @@ plot_forecast <- function(rdate, forecast, data = true) {
 ## but is also optimized to plot multiple forecasts.
 
 ## NOTE: if you are just visualizing a single forecast, you DO NOT 
-## need to cbind() your projections, just the vector is enough.
+## need to cbind() your projections in forecast_mat, just the vector is enough.
 
 multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
   
