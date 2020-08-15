@@ -10,7 +10,6 @@ add_14 <- function(x) {x + 14} #adding a 14 day forecast
 add_21 <- function(x) {x + 21} #adding a 21 day forecast
 add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 
-
 ######################################################################################################################
 
 ## The full_forecast function plots the result from a single Hawkes forecast 
