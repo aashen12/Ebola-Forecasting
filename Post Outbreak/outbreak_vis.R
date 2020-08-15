@@ -199,7 +199,6 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
  
   if(res == TRUE) {
     if(days == 7) {
-      
       fdate <- as.Date(date_vec) + 7
       actual <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
@@ -216,11 +215,10 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
         )
       )
       row.names(df_show) <- 1:nrow(df_show)
-      colnames(df_show) <- c("prior_date","prior total","forecast_date","forecast.total.7","actual.total.7")
+      colnames(df_show) <- c("prior.date","prior.total","forecast.date","forecast.total.7","actual.total.7")
       
     } 
     else if(days == 14) {
-      
       fdate <- as.Date(date_vec) + 14
       actual <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
@@ -237,7 +235,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
         )
       )
       row.names(df_show) <- 1:nrow(df_show)
-      colnames(df_show) <- c("prior_date","prior total","forecast_date","forecast.total.14","actual.total.14")
+      colnames(df_show) <- c("prior.date","prior.total","forecast.date","forecast.total.14","actual.total.14")
       
     }
     else {
@@ -257,7 +255,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, res
         )
       )
       row.names(df_show) <- 1:nrow(df_show)
-      colnames(df_show) <- c("prior_date","prior total","forecast_date","forecast.total.21","actual.total.21")
+      colnames(df_show) <- c("prior.date","prior.total","forecast.date","forecast.total.21","actual.total.21")
     }
     return(list(g, df_show))
     
