@@ -144,6 +144,16 @@ mod$plot
 
 # RMSE for Full Hawkes and Recursive Forecasts
 
+We compute the Root Mean Square Error (RMSE) of the 7, 14, and 21-day forecasts for both the Hawkes and Recursive models. The RMSEcan be computed as
+
+$$
+\begin{aligned}
+RMSE = \sqrt{\frac{\sum_{i=1}^{N}(y_i - \hat{y}_i)}{N}}
+\end{aligned}
+$$
+
+where N is the total number of observations.
+
 The table below (Table 1) shows the RMSE values for the Hawkes and Recursive models, with respect to every simulated forecast during the outbreak.
 
 ```{r, echo = FALSE}
