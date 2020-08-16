@@ -1,0 +1,78 @@
+---
+title: "Ebola Forecasting - Error Analysis"
+author: "Andy Shen"
+date: "8/15/2020"
+output: pdf_document
+---
+
+# Data Input and Cleaning
+
+## Outbreak Dataset
+
+```{r}
+rm(list=ls())
+true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
+source("outbreak_vis.R") #script with functions
+rgx <- "\\d{1,2}\\/\\d{1,2}\\/\\d{4}" #date structure regex
+true <- true[str_detect(true$Date, rgx),] #omits rows without a date
+colnames(true) <- c("date", "cases")
+true$date <- mdy(true$date)
+true$cases[is.na(true$cases)] <- 0
+true <- true %>% mutate(total = cumsum(cases))
+last_date <- true$date[length(true$date)]
+last_case <- true$total[length(true$total)]
+```
+
+## Hawkes Projections Dataset
+
+```{r}
+hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj.csv")
+hproj <- hproj %>% select(date_last_case, pred.7, pred.14, pred.21)
+hproj$date_last_case <- mdy(hproj$date_last_case)
+dates <- as.character(hproj$date_last_case)
+preds <- t(hproj %>% select(pred.7,pred.14,pred.21))
+```
+
+\pagebreak
+
+# Hawkes Complete Outbreak Analysis
+
+## 7-Day Forecast Analysis
+
+```{r}
+mod <- single_forecast(dates, preds, days = 7, res = TRUE)
+head(mod$results, 10)
+mod$rmse
+mod$plot
+```
+
+\pagebreak
+
+## 14-Day Forecast Analysis
+
+```{r}
+mod <- single_forecast(dates, preds, days = 14, res = TRUE)
+results <- mod$results
+head(mod$results, 10)
+mod$rmse
+mod$plot
+```
+
+\pagebreak
+
+## 21-Day Forecast Analysis
+
+```{r}
+mod <- single_forecast(dates, preds, days = 21, res = TRUE)
+head(mod$results, 10)
+mod$rmse
+mod$plot
+```
+
+\pagebreak
+
+# Hawkes Partial Outbreak Analysis
+
+After analyzing the entire model, we then refine our analysis to a select number of forecasts.
+
+

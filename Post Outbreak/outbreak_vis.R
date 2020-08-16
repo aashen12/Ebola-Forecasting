@@ -129,6 +129,7 @@ multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
 ## Function that accepts a vector of dates (date_vec) and 
 ## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
 ## as well as the number of forecasted days you want to visualize (days).
+## Each column of forecast_mat must contain the c(7-day projection, 14-day projection, 21-day projection)
 ## The data argument accepts a data frame with the corresponding data.
 ## The res argument decides whether to output results along with a plot. Returns just the plot by default.
 ## The title argument is the title for the corresponding plot.
@@ -182,7 +183,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
   ) + 
     geom_line() + 
     theme_light() + 
-    geom_vline(xintercept = as.Date(date_vec), col = "navy") +  #line at the dates  
+    geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at the dates  
     geom_point(
       data = df,
       mapping = aes(
@@ -202,65 +203,102 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
  
   if(res == TRUE) {
     if(days == 7) {
-      fdate <- as.Date(date_vec) + 7
+      fdate <- as.Date(date_vec) + 7 #add 7 for 7-day forecast
       actual <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
-        actual[i] <- data$total[data$date == as.Date(fdate[i])]
-      }
+        if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
+          actual[i] <- NA # accounting for blank arguments
+        } else{
+          actual[i] <- data$total[data$date == as.Date(fdate[i])]
+        }
+      } #record the actual number of cases for the given increment (days)
       
       df_show <- data.frame(
         cbind(
           date_vec,
           total_vec,
           dfdate,
-          total_vec + forecast_mat[1,],
-          actual
+          actual,
+          total_vec + forecast_mat[1,]
         )
       )
       row.names(df_show) <- 1:nrow(df_show)
-      colnames(df_show) <- c("prior.date","prior.total","forecast.date","forecast.total.7","actual.total.7")
-      
+      colnames(df_show) <- c("prior.date","prior.total","forecast.date","actual.total","forecast.total")
+      df_show$prior.total <- as.numeric(df_show$prior.total)
+      df_show$actual.total <- as.numeric(df_show$actual.total)
+      df_show$forecast.total <- as.numeric(df_show$forecast.total)
+      df_show <- df_show %>% mutate(
+        resids = actual.total - forecast.total
+      ) 
+      RMSE <- df_show %>% summarise(
+        RMSE = sqrt( mean(na.omit(resids)^2) )
+      )
     } 
     else if(days == 14) {
       fdate <- as.Date(date_vec) + 14
       actual <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
-        actual[i] <- data$total[data$date == as.Date(fdate[i])]
-      }
+        if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
+          actual[i] <- NA # accounting for blank arguments
+        } else{
+          actual[i] <- data$total[data$date == as.Date(fdate[i])]
+        }
+      } #record the actual number of cases for the given increment (days)
       
       df_show <- data.frame(
         cbind(
           date_vec,
           total_vec,
           dfdate,
-          total_vec + forecast_mat[2,],
-          actual
+          actual,
+          total_vec + forecast_mat[2,]
         )
       )
       row.names(df_show) <- 1:nrow(df_show)
-      colnames(df_show) <- c("prior.date","prior.total","forecast.date","forecast.total.14","actual.total.14")
-      
+      colnames(df_show) <- c("prior.date","prior.total","forecast.date","actual.total","forecast.total")
+      df_show$prior.total <- as.numeric(df_show$prior.total)
+      df_show$actual.total <- as.numeric(df_show$actual.total)
+      df_show$forecast.total <- as.numeric(df_show$forecast.total)
+      df_show <- df_show %>% mutate(
+        resids = actual.total - forecast.total
+      )
+      RMSE <- df_show %>% summarise(
+        RMSE = sqrt( mean(na.omit(resids)^2) )
+      )
     }
     else {
       fdate <- as.Date(date_vec) + 21
       actual <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
-        actual[i] <- data$total[data$date == as.Date(fdate[i])]
-      }
+        if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
+          actual[i] <- NA # accounting for blank arguments
+        } else{
+          actual[i] <- data$total[data$date == as.Date(fdate[i])]
+        }
+      }#record the actual number of cases for the given increment (days)
       
       df_show <- data.frame(
         cbind(
           date_vec,
           total_vec,
           dfdate,
-          total_vec + forecast_mat[3,],
-          actual
+          actual,
+          total_vec + forecast_mat[3,]
         )
       )
       row.names(df_show) <- 1:nrow(df_show)
-      colnames(df_show) <- c("prior.date","prior.total","forecast.date","forecast.total.21","actual.total.21")
+      colnames(df_show) <- c("prior.date","prior.total","forecast.date","actual.total","forecast.total")
+      df_show$prior.total <- as.numeric(df_show$prior.total)
+      df_show$actual.total <- as.numeric(df_show$actual.total)
+      df_show$forecast.total <- as.numeric(df_show$forecast.total)
+      df_show <- df_show %>% mutate(
+        resids = actual.total - forecast.total
+      )
+      RMSE <- df_show %>% summarise(
+        RMSE = sqrt( mean(na.omit(resids)^2) )
+      )
     }
-    return(list(g, df_show))
+    return(list(results = df_show, rmse = RMSE, plot = g))
     
   } 
   

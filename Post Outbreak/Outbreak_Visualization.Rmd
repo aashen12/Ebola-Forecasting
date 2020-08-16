@@ -7,11 +7,13 @@ output: pdf_document
 
 # Data Input and Cleaning
 
+## Outbreak Dataset
+
 ```{r}
 rm(list=ls())
+true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
 source("outbreak_vis.R") #script with functions
 rgx <- "\\d{1,2}\\/\\d{1,2}\\/\\d{4}" #date structure regex
-true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
 true <- true[str_detect(true$Date, rgx),] #omits rows without a date
 colnames(true) <- c("date", "cases")
 true$date <- mdy(true$date)
@@ -19,6 +21,14 @@ true$cases[is.na(true$cases)] <- 0
 true <- true %>% mutate(total = cumsum(cases))
 last_date <- true$date[length(true$date)]
 last_case <- true$total[length(true$total)]
+```
+
+## Hawkes Projections Dataset
+
+```{r}
+hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj.csv")
+hproj <- hproj %>% select(date_last_case, pred.7,pred.14,pred.21)
+hproj$date_last_case <- mdy(hproj$date_last_case)
 ```
 
 \pagebreak
@@ -70,6 +80,7 @@ Monthly forecasts during all available data in 2018.
 title <- "Forecasts vs Actual in 2018"
 dv <- c("2018-08-27","2018-09-27","2018-10-31","2018-11-29","2018-12-30")
 mt <- cbind(c(15,24,31),c(10,18,27),c(15,28,42),c(15,29,41),c(21,40,60))
+rbind(dv,mt)
 multi_forecast(dv, mt, title = title)
 ```
 
@@ -101,3 +112,10 @@ single_forecast(dv, mt, days = 14, title = title, res = TRUE)
 title <- "21-Day Forecasts vs Actual in 2018"
 single_forecast(dv, mt, days = 21, title = title, res = TRUE)
 ```
+
+\pagebreak
+
+# Hawkes Visualizations
+
+
+
