@@ -327,7 +327,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       RMSE <- df_show %>% summarise(
         RMSE = sqrt( mean(na.omit(resids)^2) )
       )
-      RMSE <- RMSE[1,1]
+      RMSE <- RMSE[1,1] #calculate rmse
     }
     return(list(results = df_show, rmse = RMSE, plot = gsimp))
     
