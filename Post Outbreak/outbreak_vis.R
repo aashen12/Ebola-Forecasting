@@ -4,6 +4,8 @@
 
 library(tidyverse)
 library(lubridate)
+library(knitr)
+library(Metrics)
 
 add_7 <- function(x) {x + 7} #adding on 7 days
 add_14 <- function(x) {x + 14} #adding on 14 days
@@ -140,7 +142,7 @@ multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
 ## the Hawkes model projections for that indicated day.
 
 single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = TRUE) {
-  size <- 3.2
+  size <- 3.0
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
   min_date <- min(ymd(date_vec)) #latest date using lubridate
@@ -330,9 +332,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       RMSE <- RMSE[1,1] #calculate rmse
     }
     return(list(results = df_show, rmse = RMSE, plot = gsimp))
-    
   } 
-  
   else {
     return(gfull)
   }

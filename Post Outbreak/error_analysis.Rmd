@@ -9,7 +9,7 @@ output: pdf_document
 
 We assume the most accurate dataset is the most recent dataset of the outbreak. We tally the cases such that there is a running total of infections at each date.
 
-We then import the projections from the Hawkes and Recursive models. For these predictions, the date preceding the forecasts is the last date of that dataset with at least one case. The forecasted numbers then predict the additional number of infections 7, 14, and 21 days, respectively, after that date.  
+We then import the projections from the Hawkes and Recursive models. For these predictions, the date preceding the forecasts is the last date of that dataset with at least one case. The forecasted numbers then predict the additional number of infections 7, 14, and 21 days after that date, respectively.  
 
 The code has been omitted for readability.
 
@@ -30,8 +30,6 @@ last_date <- true$date[length(true$date)]
 last_case <- true$total[length(true$total)]
 ```
 
-
-
 ```{r, include = FALSE}
 ## Hawkes Projections Dataset
 hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj.csv") #forecasted values
@@ -40,8 +38,6 @@ hproj$date_last_case <- mdy(hproj$date_last_case)
 hdates <- as.character(hproj$date_last_case)
 hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21))
 ```
-
-
 
 ```{r, include = FALSE}
 ## Recursive Projections Dataset
@@ -68,6 +64,8 @@ rmse_h7 <- mod$rmse
 mod$plot
 ```
 
+The 7-day Hawkes model generally shows accurate predictions throughout the duration of the pandemic, with slight under-prediction in 2019 during the middle of the pandemic. The Hawkes 7-day forecasts appear to predict the case counts at the beginning and end of the pandemic quite accurately.
+
 \pagebreak
 
 ## 14-Day Forecast Analysis
@@ -82,6 +80,8 @@ rmse_h14 <- mod$rmse
 mod$plot
 ```
 
+The 14-day Hawkes predictions tend to slightly under-predict the true case counts in the beginning and middle portions of the pandemic, with more accurate prediction in 2020 as the pandemic comes to an end. The largest prediction discrepancy is during 2019.
+
 \pagebreak
 
 ## 21-Day Forecast Analysis
@@ -95,6 +95,8 @@ mod <- single_forecast(hdates, hpreds, days = 21, res = TRUE, title = title)
 rmse_h21 <- mod$rmse
 mod$plot
 ```
+
+The 21-day Hawkes projections follow a similar pattern as 14-day Hawkes projections, with large under-predictions in the middle of the pandemic and more accurate projections in 2020 towards the end.
 
 \pagebreak
 
@@ -112,6 +114,8 @@ rmse_r7 <- mod$rmse
 mod$plot
 ```
 
+In general, the 7-day Recursive projections tend to under-predict the actual case counts. The largest errors generally occur during mid-2019, which is in the middle of the pandemic, whereas the model tends to have better prediction in the beginning and towards the end of the pandemic.
+
 \pagebreak
 
 ## 14-Day Forecast Analysis
@@ -125,6 +129,8 @@ mod <- single_forecast(rdates, rpreds, days = 14, res = TRUE, title = title)
 rmse_r14 <- mod$rmse
 mod$plot
 ```
+
+The 14-day Recursive forecasts tend to under-predict the actual case counts during most of the pandemic, and has better prediction at the end of the pandemic.
 
 \pagebreak
 
@@ -140,11 +146,13 @@ rmse_r21 <- mod$rmse
 mod$plot
 ```
 
+Similar to the 14-day forecasts, the 21-day Recursive forecasts tend to under-predict the true case counts in the beginning and middle of the pandemic, but is more accurate towards the end of the pandemic with slight over-prediction.
+
 \pagebreak
 
 # RMSE for Full Hawkes and Recursive Forecasts
 
-We compute the Root Mean Square Error (RMSE) of the 7, 14, and 21-day forecasts for both the Hawkes and Recursive models. The RMSEcan be computed as
+We compute the Root Mean Square Error (RMSE) of the 7, 14, and 21-day forecasts for both the Hawkes and Recursive models. The RMSE is computed as
 
 $$
 \begin{aligned}
@@ -157,10 +165,7 @@ where N is the total number of observations.
 The table below (Table 1) shows the RMSE values for the Hawkes and Recursive models, with respect to every simulated forecast during the outbreak.
 
 ```{r, echo = FALSE}
-library(knitr)
-tbl <- 1 #table number tally
 caption <- paste0("RMSE values for Hawkes and Recursive Models for all simulations.")
-tbl <- tbl + 1
 df_rmse <- data.frame(
   "Hawkes" = c(rmse_h7, rmse_h14, rmse_h21),
   "Recursive" = c(rmse_r7, rmse_r14, rmse_r21)
@@ -169,13 +174,14 @@ row.names(df_rmse) <- c("7-day","14-day","21-day")
 df_rmse %>% kable(digits = 2, caption = caption)
 ```
 
-
 We see that the Hawkes model forecasts have a consistently lower RMSE than those of the Recursive model for all three prediction days, when looking at all simulations.
 
 \pagebreak
 
 # Hawkes Partial Outbreak Analysis
 
-After analyzing the entire model, we then refine our analysis to a select number of forecasts.
+After analyzing the entire model, we then adjust our analysis to account for the varying number of forecasts performed during a year. The pandemic began in mid-2018 and lasted until mid-2020. Since more forecasts were performed in the earlier parts of the pandemic compared to the later portion, we adjust our data to reflect an equal number of simulations per year, so that each year as a proportionate number of forecasts.
+
+
 
 
