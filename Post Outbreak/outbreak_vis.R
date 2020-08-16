@@ -139,7 +139,7 @@ multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
 ## The function returns a visualization of confirmed cases vs
 ## the Hawkes model projections for that indicated day.
 
-single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = FALSE) {
+single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = TRUE) {
   size <- 3.2
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
@@ -177,13 +177,13 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
   # this recycles, so order is very important here!
   df <- data.frame(dfdate, forecast_total) # data frame for ggplot
   
-  g <- ggplot(
+  gfull <- ggplot(
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
     theme_light() + 
-    geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at the dates  
+    geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at the dates
     geom_point(
       data = df,
       mapping = aes(
@@ -192,12 +192,40 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       ),
       color = col,
       size = size
-      
-    ) + theme(legend.position = "bottom") + labs(title = title) +
+
+    ) +
+    theme(legend.position = "bottom") + labs(title = title) +
     geom_path(
       data = df,
       aes(x = as.Date(dfdate), y = forecast_total),
       color = col,
+      #linetype = "dashed",
+      size = size - 2.2
+    )
+  
+  gsimp <- ggplot(
+    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
+    mapping = aes(x = date, y = total)
+  ) + 
+    geom_line() + 
+    theme_light() + 
+    # geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at the dates
+    # geom_point(
+    #   data = df,
+    #   mapping = aes(
+    #     x = as.Date(dfdate),
+    #     y = forecast_total,
+    #   ),
+    #   color = col,
+    #   size = size
+    #   
+    # ) +
+    theme(legend.position = "bottom") + labs(title = title) +
+    geom_path(
+      data = df,
+      aes(x = as.Date(dfdate), y = forecast_total),
+      color = col,
+      linetype = "dashed",
       size = size - 2.2
     )
  
@@ -233,6 +261,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       RMSE <- df_show %>% summarise(
         RMSE = sqrt( mean(na.omit(resids)^2) )
       )
+      RMSE <- RMSE[1,1]
     } 
     else if(days == 14) {
       fdate <- as.Date(date_vec) + 14
@@ -265,6 +294,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       RMSE <- df_show %>% summarise(
         RMSE = sqrt( mean(na.omit(resids)^2) )
       )
+      RMSE <- RMSE[1,1]
     }
     else {
       fdate <- as.Date(date_vec) + 21
@@ -297,13 +327,14 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       RMSE <- df_show %>% summarise(
         RMSE = sqrt( mean(na.omit(resids)^2) )
       )
+      RMSE <- RMSE[1,1]
     }
-    return(list(results = df_show, rmse = RMSE, plot = g))
+    return(list(results = df_show, rmse = RMSE, plot = gsimp))
     
   } 
   
   else {
-    return(g)
+    return(gfull)
   }
 }
 ######################################################################################################################
