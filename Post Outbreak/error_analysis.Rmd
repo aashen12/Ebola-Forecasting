@@ -4,7 +4,11 @@ author: "Andy Shen"
 output: pdf_document
 ---
 
-# Data Input and Cleaning
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# 1 Data Input and Cleaning
 
 
 We assume the most accurate dataset is the most recent dataset of the outbreak. We tally the cases such that there is a running total of infections at each date.
@@ -33,33 +37,34 @@ last_case <- true$total[length(true$total)]
 ```{r, include = FALSE}
 ## Hawkes Projections Dataset
 hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj.csv") #forecasted values
-hproj <- hproj %>% select(date_last_case, pred.7, pred.14, pred.21)
+hproj <- hproj %>% select(date_last_case, pred.7, pred.14, pred.21) #selecting only the cols with forecasts
 hproj$date_last_case <- mdy(hproj$date_last_case)
-hdates <- as.character(hproj$date_last_case)
-hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21))
+hdates <- as.character(hproj$date_last_case) #for working with dates
+hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21)) #take t() for the function
+rownames(hproj) <- 1:nrow(hproj)
 ```
 
 ```{r, include = FALSE}
 ## Recursive Projections Dataset
 rproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/recursive_post_proj.csv") #forecasted values
-rproj <- rproj %>% select(date_last_case, pred.7, pred.14, pred.21)
+rproj <- rproj %>% select(date_last_case, pred.7, pred.14, pred.21) 
 rproj$date_last_case <- mdy(rproj$date_last_case)
 rproj <- na.omit(rproj) # some dates have no projections
 rdates <- as.character(rproj$date_last_case)
 rpreds <- t(rproj %>% select(pred.7,pred.14,pred.21))
 ```
 
-# Hawkes Complete Outbreak Analysis
+# 2 Hawkes Complete Outbreak Analysis
 
 ## 7-Day Forecast Analysis
 
 Figure 1 below shows the Hawkes 7-Day Forecasts for all simulations with respect to the recorded number of infections. The RMSE values for all forecasts are included in Table 1.\newline
 
 ```{r, echo = FALSE}
-fig <- 1
+fig <- 1 # for numbering the figures in the plots
 title <- paste0("Figure ",fig,": Hawkes 7-Day Forecasts for All Simulations")
 fig <- fig + 1
-mod <- single_forecast(hdates, hpreds, days = 7, res = TRUE, title = title)
+mod <- single_forecast(hdates, hpreds, days = 7,  title = title, res = TRUE)
 rmse_h7 <- mod$rmse
 mod$plot
 ```
@@ -72,10 +77,10 @@ The 7-day Hawkes model generally shows accurate predictions throughout the durat
 
 Figure 2 below shows the Hawkes 14-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
 
-```{r, echo=FALSE}
+```{r}
 title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for All Simulations")
 fig <- fig + 1
-mod <- single_forecast(hdates, hpreds, days = 14, res = TRUE)
+mod <- single_forecast(hdates, hpreds, days = 14, title = title, res = TRUE)
 rmse_h14 <- mod$rmse
 mod$plot
 ```
@@ -88,10 +93,10 @@ The 14-day Hawkes predictions tend to slightly under-predict the true case count
 
 Figure 3 below shows the Hawkes 21-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
 
-```{r, echo=FALSE}
+```{r}
 title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for All Simulations")
 fig <- fig + 1
-mod <- single_forecast(hdates, hpreds, days = 21, res = TRUE, title = title)
+mod <- single_forecast(hdates, hpreds, days = 21,  title = title, res = TRUE)
 rmse_h21 <- mod$rmse
 mod$plot
 ```
@@ -100,16 +105,16 @@ The 21-day Hawkes projections follow a similar pattern as 14-day Hawkes projecti
 
 \pagebreak
 
-# Recursive Complete Outbreak Analysis
+# 3 Recursive Complete Outbreak Analysis
 
 ## 7-Day Forecast Analysis
 
 Figure 4 below shows the Recursive 7-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
 
-```{r, echo=FALSE}
+```{r}
 title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Simulations")
 fig <- fig + 1
-mod <- single_forecast(rdates, rpreds, days = 7, res = TRUE, title = title)
+mod <- single_forecast(rdates, rpreds, days = 7, title = title, res = TRUE)
 rmse_r7 <- mod$rmse
 mod$plot
 ```
@@ -122,10 +127,10 @@ In general, the 7-day Recursive projections tend to under-predict the actual cas
 
 Figure 5 below shows the Recursive 14-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
 
-```{r, echo=FALSE}
+```{r}
 title <- paste0("Figure ",fig,": Recursive 14-Day Forecasts for All Simulations")
 fig <- fig + 1
-mod <- single_forecast(rdates, rpreds, days = 14, res = TRUE, title = title)
+mod <- single_forecast(rdates, rpreds, days = 14, title = title, res = TRUE)
 rmse_r14 <- mod$rmse
 mod$plot
 ```
@@ -138,10 +143,10 @@ The 14-day Recursive forecasts tend to under-predict the actual case counts duri
 
 Figure 6 below shows the Recursive 21-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
 
-```{r, echo=FALSE}
+```{r}
 title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Simulations")
 fig <- fig + 1
-mod <- single_forecast(rdates, rpreds, days = 21, res = TRUE, title = title)
+mod <- single_forecast(rdates, rpreds, days = 21, title = title, res = TRUE)
 rmse_r21 <- mod$rmse
 mod$plot
 ```
@@ -150,7 +155,7 @@ Similar to the 14-day forecasts, the 21-day Recursive forecasts tend to under-pr
 
 \pagebreak
 
-# RMSE for Full Hawkes and Recursive Forecasts
+# 4 RMSE for Full Hawkes and Recursive Forecasts
 
 We compute the Root Mean Square Error (RMSE) of the 7, 14, and 21-day forecasts for both the Hawkes and Recursive models. The RMSE is computed as
 
@@ -160,28 +165,238 @@ RMSE = \sqrt{\frac{\sum_{i=1}^{N}(y_i - \hat{y}_i)}{N}}
 \end{aligned}
 $$
 
-where N is the total number of observations.
+where $N$ is the total number of observations.
 
 The table below (Table 1) shows the RMSE values for the Hawkes and Recursive models, with respect to every simulated forecast during the outbreak.
 
-```{r, echo = FALSE}
+```{r}
 caption <- paste0("RMSE values for Hawkes and Recursive Models for all simulations.")
 df_rmse <- data.frame(
   "Hawkes" = c(rmse_h7, rmse_h14, rmse_h21),
   "Recursive" = c(rmse_r7, rmse_r14, rmse_r21)
 )
 row.names(df_rmse) <- c("7-day","14-day","21-day")
-df_rmse %>% kable(digits = 2, caption = caption)
+df_rmse %>% kable(digits = 2, caption = caption) #creates a tabble with RMSE values
 ```
 
 We see that the Hawkes model forecasts have a consistently lower RMSE than those of the Recursive model for all three prediction days, when looking at all simulations.
 
 \pagebreak
 
-# Hawkes Partial Outbreak Analysis
+# 5 Partial Outbreak Analysis
 
-After analyzing the entire model, we then adjust our analysis to account for the varying number of forecasts performed during a year. The pandemic began in mid-2018 and lasted until mid-2020. Since more forecasts were performed in the earlier parts of the pandemic compared to the later portion, we adjust our data to reflect an equal number of simulations per year, so that each year as a proportionate number of forecasts.
+After analyzing the entire model, we then adjust our analysis to account for the varying number of forecasts performed during a year. The pandemic began in August 2018 and lasted until May 2020. Since more forecasts were performed in the earlier parts of the pandemic compared to the later portion, we adjust our data to reflect an equal number of simulations per year, so that each year as a proportionate number of forecasts.
+
+```{r, include=FALSE}
+rgx18 <- "2018\\-\\d{1,2}\\-\\d{1,2}" # 2018 date structure regex
+rgx19 <- "2019\\-\\d{1,2}\\-\\d{1,2}" # 2019 date structure regex
+rgx20 <- "2020\\-\\d{1,2}\\-\\d{1,2}" # 2020 date structure regex
+
+true18 <- true[str_detect(true$date, rgx18),] #thinning down data by year
+true19 <- true[str_detect(true$date, rgx19),]
+true20 <- true[str_detect(true$date, rgx20),]
+nums <- c(nrow(true18),nrow(true19),nrow(true20))
+names(nums) <- c("2018","2019","2020")
+nums
+sum(nrow(true18),nrow(true19),nrow(true20))==nrow(true)
+```
+
+The pandemic lasted for 243 days in 2018, 365 days in 2019, and 125 days in 2020.
+
+```{r, include=FALSE}
+hproj18 <- hproj[str_detect(hproj$date_last_case, rgx18),] #should be 92
+hproj19 <- hproj[str_detect(hproj$date_last_case, rgx19),] 
+hproj20 <- hproj[str_detect(hproj$date_last_case, rgx20),] 
+nums <- c(nrow(hproj18),nrow(hproj19),nrow(hproj20))
+names(nums) <- c("2018","2019","2020")
+nums #number of forecasts in that year
+sum(nrow(hproj18),nrow(hproj19),nrow(hproj20)) == nrow(hproj) #making sure I did it correctly
+```
+
+For the Hawkes model, we made 92 forecasts in 2018, 78 forecasts in 2019, and 9 forecasts in 2020.
+
+```{r, include=FALSE}
+rproj18 <- rproj[str_detect(rproj$date_last_case, rgx18),] #should be 92
+rproj19 <- rproj[str_detect(rproj$date_last_case, rgx19),] 
+rproj20 <- rproj[str_detect(rproj$date_last_case, rgx20),] 
+nums <- c(nrow(rproj18),nrow(rproj19),nrow(rproj20))
+names(nums) <- c("2018","2019","2020")
+nums #number of forecasts in that year
+sum(nrow(rproj18),nrow(rproj19),nrow(rproj20)) == nrow(rproj)
+```
+
+For the Recursive model, we made 77 forecasts in 2018, 78 forecasts in 2019, and 9 forecasts in 2020.
+
+```{r, include=FALSE}
+pro <- function(d) {round(d*12/365, 1)} #apportions days to months
+pro(c(nrow(true18),nrow(true19),nrow(true20)))
+```
+
+For our refined analysis, we select two forecasts for every month data was available, one in the middle of the month and one towards the end. For months with only one forecast, we select only that one. For months with two forecasts occurring within a week of each other, we select both forecasts.
+
+In 2018, we analyze the forecasts on the following 10 dates:
+
+  - 2018-08-14 
+  - 2018-08-27 
+  - 2018-09-14 
+  - 2018-09-27 
+  - 2018-10-14 
+  - 2018-10-31 
+  - 2018-11-16 
+  - 2018-11-29 
+  - 2018-12-14 
+  - 2018-12-30 
+
+  
+```{r, include = FALSE}
+rows18h <- c(1,3,16,24,37,54,63,73,81,92)
+rows18r <- c(1,3,15,21,33,45,51,59,66,77)
+```
+
+In 2019, we analyze the forecasts on the following 15 dates:
+
+  - 2019-01-14 
+  - 2019-01-30 
+  - 2019-02-16 
+  - 2019-02-28 
+  - 2019-03-15 
+  - 2019-03-23 
+  - 2019-04-08 
+  - 2019-04-27
+  - 2019-05-15 
+  - 2019-05-28 
+  - 2019-06-19
+  - 2019-07-19
+  - 2019-07-26
+  - 2019-09-27
+  - 2019-10-10
+  - 2019-10-30
+
+```{r, include = FALSE}
+rows19h <- c(105,120,130,136,142,146,150,153,157,160,161,162,164,165,167,170)
+rows19r <- c(90,105,115,121,127,131,135,142,145,146,147,149,150,152,155)
+```
 
 
+In 2020, we analyze the forecasts on the following 5 dates:
+
+  - 2020-01-12
+  - 2020-01-31 
+  - 2020-02-06 
+  - 2020-04-12
+  - 2020-04-21
+  
+```{r, include = FALSE}
+rows20h <- c(171,174,176,178,179)
+rows20r <- c(156,159,161,163,164)
+allh <- c(rows18h, rows19h, rows20h) #combining all rows mentioned above
+allr <- c(rows18r, rows19r, rows20r)
+```
+
+\pagebreak
+  
+# 6 Refined Hawkes Analysis
+
+```{r}
+ref_hawkes <- hproj[allh,]
+hdates_ref <- as.Date(ref_hawkes$date_last_case)
+hpreds_ref <- t(ref_hawkes %>% select(pred.7,pred.14,pred.21))
+```
+
+
+## 7-Day Forecast Analysis
+
+```{r}
+title <- paste0("Figure ",fig,": Hawkes 7-Day Forecasts for Select Simulations")
+fig <- fig + 1
+mod <- single_forecast(hdates_ref, hpreds_ref, days = 7, res = TRUE, title = title, refined = TRUE)
+rmse_h7 <- mod$rmse
+mod$plot
+```
+
+
+\pagebreak
+
+## 14-Day Forecast Analysis
+
+```{r}
+title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for Select Simulations")
+fig <- fig + 1
+mod <- single_forecast(hdates_ref, hpreds_ref, days = 14, res = TRUE, title = title, refined = TRUE)
+rmse_h14 <- mod$rmse
+mod$plot
+```
+
+\pagebreak
+
+## 21-Day Forecast Analysis
+
+```{r}
+title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for Select Simulations")
+fig <- fig + 1
+mod <- single_forecast(hdates_ref, hpreds_ref, days = 21, res = TRUE, title = title, refined = TRUE)
+rmse_h21 <- mod$rmse
+mod$plot
+```
+
+\pagebreak
+
+# 7 Refined Recursive Analysis
+
+```{r}
+ref_rec <- rproj[allr,]
+rdates_ref <- as.Date(ref_rec$date_last_case)
+rpreds_ref <- t(ref_rec %>% select(pred.7,pred.14,pred.21))
+```
+  
+## 7-Day Forecast Analysis
+
+```{r}
+title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for Select Simulations")
+fig <- fig + 1
+mod <- single_forecast(rdates_ref, rpreds_ref, days = 7, res = TRUE, title = title, refined = TRUE)
+rmse_r7 <- mod$rmse
+mod$plot
+```
+
+\pagebreak
+
+## 14-Day Forecast Analysis
+
+```{r}
+title <- paste0("Figure ",fig,": Recursive 14-Day Forecasts for Select Simulations")
+fig <- fig + 1
+mod <- single_forecast(rdates_ref, rpreds_ref, days = 14, res = TRUE, title = title, refined = TRUE)
+rmse_r14 <- mod$rmse
+mod$plot
+```
+
+\pagebreak
+
+## 21-Day Forecast Analysis
+
+```{r}
+title <- paste0("Figure ",fig,": Recursive 21-Day Forecasts for Select Simulations")
+fig <- fig + 1
+mod <- single_forecast(rdates_ref, rpreds_ref, days = 21, res = TRUE, title = title, refined = TRUE)
+rmse_r21 <- mod$rmse
+mod$plot
+```
+
+\pagebreak
+
+# 8 RMSE for Select Hawkes and Recursive Forecasts
+
+As with Table 1, we perform the same RMSE calculation and the results are given in Table 2 below.
+
+```{r}
+caption <- paste0("RMSE values for Hawkes and Recursive Models for select simulations.")
+df_rmse <- data.frame(
+  "Hawkes" = c(rmse_h7, rmse_h14, rmse_h21),
+  "Recursive" = c(rmse_r7, rmse_r14, rmse_r21)
+)
+row.names(df_rmse) <- c("7-day","14-day","21-day")
+df_rmse %>% kable(digits = 2, caption = caption) #creates a tabble with RMSE values
+```
 
 

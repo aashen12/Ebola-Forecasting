@@ -80,7 +80,7 @@ plot_forecast <- function(rdate, forecast, data = true) {
 ## NOTE: if you are just visualizing a single forecast, you DO NOT 
 ## need to cbind() your projections in forecast_mat, just the vector is enough.
 
-multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
+multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL, refined = FALSE) {
   
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   
@@ -141,7 +141,7 @@ multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
 ## The function returns a visualization of confirmed cases vs
 ## the Hawkes model projections for that indicated day.
 
-single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = TRUE) {
+single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = TRUE, refined = FALSE) {
   size <- 3.0
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
@@ -203,6 +203,32 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       #linetype = "dashed",
       size = size - 2.2
+    )
+  
+  gfull_ref <- ggplot(
+    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
+    mapping = aes(x = date, y = total)
+  ) + 
+    geom_line() + 
+    theme_light() + 
+    #geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at the dates
+    geom_point(
+      data = df,
+      mapping = aes(
+        x = as.Date(dfdate),
+        y = forecast_total,
+      ),
+      color = col,
+      size = 2.5
+      
+    ) +
+    theme(legend.position = "bottom") + labs(title = title) +
+    geom_path(
+      data = df,
+      aes(x = as.Date(dfdate), y = forecast_total),
+      color = col,
+      #linetype = "dashed",
+      size = 0.65
     )
   
   gsimp <- ggplot(
@@ -331,7 +357,11 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       )
       RMSE <- RMSE[1,1] #calculate rmse
     }
-    return(list(results = df_show, rmse = RMSE, plot = gsimp))
+    if(refined == TRUE) {
+      return(list(results = df_show, rmse = RMSE, plot = gfull_ref))
+    } else {
+      return(list(results = df_show, rmse = RMSE, plot = gsimp))
+    }
   } 
   else {
     return(gfull)
