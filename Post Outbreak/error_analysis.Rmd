@@ -236,6 +236,11 @@ For our refined analysis, we select two forecasts for every month data was avail
 
 In 2018, we analyze the forecasts on the following 10 dates:
 
+```{r}
+hproj18
+```
+
+
   - 2018-08-14 
   - 2018-08-27 
   - 2018-09-14 
@@ -398,5 +403,8 @@ df_rmse <- data.frame(
 row.names(df_rmse) <- c("7-day","14-day","21-day")
 df_rmse %>% kable(digits = 2, caption = caption) #creates a tabble with RMSE values
 ```
+
+
+
 
 
