@@ -194,7 +194,6 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       ),
       color = col,
       size = size
-
     ) +
     theme(legend.position = "bottom") + labs(title = title) +
     geom_path(
@@ -203,7 +202,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       #linetype = "dashed",
       size = size - 2.2
-    )
+    ) #complete ggplot with all points
   
   gfull_ref <- ggplot(
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
@@ -220,7 +219,6 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       ),
       color = col,
       size = 2.5
-      
     ) +
     theme(legend.position = "bottom") + labs(title = title) +
     geom_path(
@@ -229,7 +227,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       #linetype = "dashed",
       size = 0.65
-    )
+    ) #no verticlal lines
   
   gsimp <- ggplot(
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
@@ -237,17 +235,6 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
   ) + 
     geom_line() + 
     theme_light() + 
-    # geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at the dates
-    # geom_point(
-    #   data = df,
-    #   mapping = aes(
-    #     x = as.Date(dfdate),
-    #     y = forecast_total,
-    #   ),
-    #   color = col,
-    #   size = size
-    #   
-    # ) +
     theme(legend.position = "bottom") + labs(title = title) +
     geom_path(
       data = df,
@@ -255,7 +242,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       linetype = "dashed",
       size = size - 2.2
-    )
+    ) #no point markers
  
   if(res == TRUE) {
     if(days == 7) {
