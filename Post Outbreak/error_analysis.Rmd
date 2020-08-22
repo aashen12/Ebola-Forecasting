@@ -1,6 +1,6 @@
 ---
 title: "Ebola Forecasting - Error Analysis"
-author: "Andy Shen"
+author: "Frederic Schoenberg, Sarita Lee, Andy Shen"
 output: pdf_document
 ---
 
@@ -62,7 +62,7 @@ rownames(hproj) <- 1:nrow(hproj)
 
 ## 7-Day Forecast Analysis
 
-Figure 1 below shows the Hawkes 7-Day Forecasts for all simulations with respect to the recorded number of infections. The RMSE values for all forecasts are included in Table 1.\newline
+Figure 1 below shows the Hawkes 7-Day Forecasts for all recorded simulations with respect to the recorded number of infections. The RMSE values for all forecasts are included in Table 1.\newline
 
 ```{r, echo = FALSE}
 fig <- 1 # for numbering the figures in the plots
@@ -79,7 +79,7 @@ The 7-day Hawkes model generally shows accurate predictions throughout the durat
 
 ## 14-Day Forecast Analysis
 
-Figure 2 below shows the Hawkes 14-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
+Figure 2 below shows the Hawkes 14-Day Forecasts for all recorded simulations with respect to the recorded number of infections.\newline
 
 ```{r}
 title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for All Simulations")
@@ -95,7 +95,7 @@ The 14-day Hawkes predictions tend to slightly under-predict the true case count
 
 ## 21-Day Forecast Analysis
 
-Figure 3 below shows the Hawkes 21-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
+Figure 3 below shows the Hawkes 21-Day Forecasts for all recorded simulations with respect to the recorded number of infections.\newline
 
 ```{r}
 title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for All Simulations")
@@ -113,7 +113,7 @@ The 21-day Hawkes projections follow a similar pattern as 14-day Hawkes projecti
 
 ## 7-Day Forecast Analysis
 
-Figure 4 below shows the Recursive 7-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
+Figure 4 below shows the Recursive 7-Day Forecasts for all recorded simulations with respect to the recorded number of infections.\newline
 
 ```{r}
 title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Simulations")
@@ -145,7 +145,7 @@ The 14-day Recursive forecasts tend to under-predict the actual case counts duri
 
 ## 21-Day Forecast Analysis
 
-Figure 6 below shows the Recursive 21-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
+Figure 6 below shows the Recursive 21-Day Forecasts for all recorded simulations with respect to the recorded number of infections.\newline
 
 ```{r}
 title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Simulations")
@@ -190,7 +190,7 @@ We see that the Hawkes model forecasts have a consistently lower RMSE than those
 
 # 5 Omission of Repeated Entries
 
-Many of the forecasts were run with the same date. These extra runs are likely due to minor adjustments in the previous numbers, so we refine our data to omit any repeated forecasts and only consider the most recent forecast with a duplicate date. Therefore, for multiple forecasts that ended on the same date, we select the entry furthest down in the dataset, as it denotes the set with the most recent numbers.
+Many of the forecasts were run with the same date. These extra runs are likely due to minor adjustments in the previously recorded data, so we refine our data to omit any repeated forecasts and only consider the most recent forecast with a repeated date. Therefore, for multiple forecasts that ended on the same date, we select the entry furthest down in the dataset, as it denotes the set with the most recent numbers.
 
 The trend for this analysis very closely mirrors that of the previous analysis in terms of prediction, as evidenced in figures 7-12 below.
 
@@ -270,7 +270,7 @@ tbl2<-df_rmse %>% kable(digits = 2, caption = caption) #creates a table with RMS
 tbl2
 ```
 
-There is not a large difference in RMSE of the full forecasts compared with those from the refined forecasts with the duplicate dates removed.
+There is not a large difference in RMSE of the full forecast analysis compared with that from the refined forecasts with the repeated dates removed.
 
 
 
