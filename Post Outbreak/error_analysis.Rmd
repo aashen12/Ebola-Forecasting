@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = FALSE)
 # 1 Data Input and Cleaning
 
 
-We assume the most accurate dataset is the most recent dataset of the outbreak. We tally the cases such that there is a running total of infections at each date.
+We assume the most accurate dataset is the most recent dataset of the outbreak. We tally the cases such that there is a running total of infections at each date. This dataset represents the true number of cases at any given point during the outbreak.
 
 We then import the projections from the Hawkes and Recursive models. For these predictions, the date preceding the forecasts is the last date of that dataset with at least one case. The forecasted numbers then predict the additional number of infections 7, 14, and 21 days after that date, respectively. 
 
@@ -165,7 +165,7 @@ We compute the Root Mean Square Error (RMSE) of the 7, 14, and 21-day forecasts 
 
 $$
 \begin{aligned}
-RMSE = \sqrt{\frac{\sum_{i=1}^{N}(y_i - \hat{y}_i)}{N}}
+RMSE = \sqrt{\frac{\sum_{i=1}^{N}(y_i - \hat{y}_i)^2}{N}}
 \end{aligned}
 $$
 
@@ -188,9 +188,11 @@ We see that the Hawkes model forecasts have a consistently lower RMSE than those
 
 \pagebreak
 
-# 5 Omission of Duplicate Entries
+# 5 Omission of Repeated Entries
 
-Many of the forecasts were run with the same date. These duplicate runs are likely due to minor adjustments in the previous numbers, so we refine our data to omit the duplicate forecasts and only consider the most recent forecast with a duplicate date.
+Many of the forecasts were run with the same date. These extra runs are likely due to minor adjustments in the previous numbers, so we refine our data to omit any repeated forecasts and only consider the most recent forecast with a duplicate date. Therefore, for multiple forecasts that ended on the same date, we select the entry furthest down in the dataset, as it denotes the set with the most recent numbers.
+
+The trend for this analysis very closely mirrors that of the previous analysis in terms of prediction, as evidenced in figures 7-12 below.
 
 
 ```{r}
