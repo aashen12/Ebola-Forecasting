@@ -180,7 +180,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
   df <- data.frame(dfdate, forecast_total) # data frame for ggplot
   
   gfull <- ggplot(
-    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
+    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),], #range is 28 days ahead and 14 days behind
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
