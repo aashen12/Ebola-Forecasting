@@ -204,11 +204,11 @@ dup_omit <- c(
 ) #entries with duplicate dates
 
 hproj_omit <- hproj[-dup_omit,]
-hdates_o <- hproj_omit$date_last_case
+hdates_o <- as.character(hproj_omit$date_last_case)
 hpreds_o <- t(hproj_omit %>% select(pred.7,pred.14,pred.21))
 
 rproj_omit <- rproj[-dup_omit,]
-rdates_o <- rproj_omit$date_last_case
+rdates_o <- as.character(rproj_omit$date_last_case)
 rpreds_o <- t(rproj_omit %>% select(pred.7,pred.14,pred.21))
 ```
 

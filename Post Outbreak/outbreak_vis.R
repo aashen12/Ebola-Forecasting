@@ -141,7 +141,7 @@ multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL, re
 ## The function returns a visualization of confirmed cases vs
 ## the Hawkes model projections for that indicated day.
 
-single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = TRUE, refined = FALSE) {
+single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = TRUE, point = FALSE) {
   size <- 3.0
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
@@ -227,7 +227,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       #linetype = "dashed",
       size = 0.65
-    ) #no verticlal lines
+    ) #no vertical lines, CONTAINS POINTS
   
   gsimp <- ggplot(
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
@@ -242,7 +242,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       linetype = "dashed",
       size = size - 2.2
-    ) #no point markers
+    ) #no point markers, but trend line is dashed
  
   if(res == TRUE) {
     if(days == 7) {
@@ -344,7 +344,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       )
       RMSE <- RMSE[1,1] #calculate rmse
     }
-    if(refined == TRUE) {
+    if(point == TRUE) {
       return(list(results = df_show, rmse = RMSE, plot = gfull_ref))
     } else {
       return(list(results = df_show, rmse = RMSE, plot = gsimp))
