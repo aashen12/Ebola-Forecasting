@@ -149,15 +149,15 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
   date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
   
   if(days == 7) {
-    forecast_vec <- forecast_mat[1,] # 7 day projections
+    forecast_vec <- forecast_mat[1,] # 7 day projections are row 1
     forc_dates <- lapply(date_vecl, add_7) # add 7 days to each date
     col <- "dodgerblue1"
   } else if(days == 14) {
-    forecast_vec <- forecast_mat[2,] # 14 day projections
+    forecast_vec <- forecast_mat[2,] # 14 day projections are row 2
     forc_dates <- lapply(date_vecl, add_14) # add 14 days to each date
     col <- "red2"
   } else {
-    forecast_vec <- forecast_mat[3,] # 21 day projections
+    forecast_vec <- forecast_mat[3,] # 21 day projections are row 3
     forc_dates <- lapply(date_vecl, add_21) # add 21 days to each date
     col <- "forestgreen"
   }
@@ -202,9 +202,9 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       #linetype = "dashed",
       size = size - 2.2
-    ) #complete ggplot with all points
+    ) #complete ggplot with all points, WITH VERTICAL LINE AT DATES
   
-  gfull_ref <- ggplot(
+  gfull_ref <- ggplot( 
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
   ) + 
@@ -227,13 +227,13 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       #linetype = "dashed",
       size = 0.65
-    ) #no vertical lines, CONTAINS POINTS
+    ) #no vertical lines, CONTAINS POINTS AT EACH FORECASTED DATE
   
   gsimp <- ggplot(
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
   ) + 
-    geom_line() + 
+    geom_line() + #line for true forecasts
     theme_light() + 
     theme(legend.position = "bottom") + labs(title = title) +
     geom_path(
@@ -244,7 +244,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       size = size - 2.2
     ) #no point markers, but trend line is dashed
  
-  if(res == TRUE) {
+  if(res == TRUE) { # CREATES ADDITIONAL OUTPUT BY CALCULATING RMSE AND GIVES RESULTS DATA FRAME
     if(days == 7) {
       fdate <- as.Date(date_vec) + 7 #add 7 for 7-day forecast
       actual <- rep(NA,length(fdate))
@@ -343,11 +343,11 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
         RMSE = sqrt( mean(na.omit(resids)^2) )
       )
       RMSE <- RMSE[1,1] #calculate rmse
-    }
-    if(point == TRUE) {
-      return(list(results = df_show, rmse = RMSE, plot = gfull_ref))
+    }  #21 DAYS
+    if(point == TRUE) { # IF YOU WANT THE PLOT WITH POINTS OR A DASHED LINE
+      return(list(results = df_show, rmse = RMSE, plot = gfull_ref)) #plot with points marking forecast projections
     } else {
-      return(list(results = df_show, rmse = RMSE, plot = gsimp))
+      return(list(results = df_show, rmse = RMSE, plot = gsimp)) # no points, just a dashed line
     }
   } 
   else {

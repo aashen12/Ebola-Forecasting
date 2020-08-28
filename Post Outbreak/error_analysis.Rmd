@@ -66,7 +66,7 @@ Figure 1 below shows the Hawkes 7-Day Forecasts for all recorded simulations wit
 
 ```{r, echo = FALSE}
 fig <- 1 # for numbering the figures in the plots
-title <- paste0("Figure ",fig,": Hawkes 7-Day Forecasts for All Simulations")
+title <- paste0("Figure ",fig,": Hawkes 7-Day Forecasts for All Datasets")
 fig <- fig + 1
 mod <- single_forecast(hdates, hpreds, days = 7,  title = title, res = TRUE)
 rmse_h7 <- mod$rmse
@@ -82,7 +82,7 @@ The 7-day Hawkes model generally shows accurate predictions throughout the durat
 Figure 2 below shows the Hawkes 14-Day Forecasts for all recorded simulations with respect to the recorded number of infections.\newline
 
 ```{r}
-title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for All Simulations")
+title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for All Datasets")
 fig <- fig + 1
 mod <- single_forecast(hdates, hpreds, days = 14, title = title, res = TRUE)
 rmse_h14 <- mod$rmse
@@ -98,7 +98,7 @@ The 14-day Hawkes predictions tend to slightly under-predict the true case count
 Figure 3 below shows the Hawkes 21-Day Forecasts for all recorded simulations with respect to the recorded number of infections.\newline
 
 ```{r}
-title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for All Simulations")
+title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for All Datasets")
 fig <- fig + 1
 mod <- single_forecast(hdates, hpreds, days = 21,  title = title, res = TRUE)
 rmse_h21 <- mod$rmse
@@ -116,7 +116,7 @@ The 21-day Hawkes projections follow a similar pattern as 14-day Hawkes projecti
 Figure 4 below shows the Recursive 7-Day Forecasts for all recorded simulations with respect to the recorded number of infections.\newline
 
 ```{r}
-title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Simulations")
+title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Datasets")
 fig <- fig + 1
 mod <- single_forecast(rdates, rpreds, days = 7, title = title, res = TRUE)
 rmse_r7 <- mod$rmse
@@ -132,7 +132,7 @@ In general, the 7-day Recursive projections tend to under-predict the actual cas
 Figure 5 below shows the Recursive 14-Day Forecasts for all simulations with respect to the recorded number of infections.\newline
 
 ```{r}
-title <- paste0("Figure ",fig,": Recursive 14-Day Forecasts for All Simulations")
+title <- paste0("Figure ",fig,": Recursive 14-Day Forecasts for All Datasets")
 fig <- fig + 1
 mod <- single_forecast(rdates, rpreds, days = 14, title = title, res = TRUE)
 rmse_r14 <- mod$rmse
@@ -148,7 +148,7 @@ The 14-day Recursive forecasts tend to under-predict the actual case counts duri
 Figure 6 below shows the Recursive 21-Day Forecasts for all recorded simulations with respect to the recorded number of infections.\newline
 
 ```{r}
-title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Simulations")
+title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Datasets")
 fig <- fig + 1
 mod <- single_forecast(rdates, rpreds, days = 21, title = title, res = TRUE)
 rmse_r21 <- mod$rmse
@@ -174,7 +174,7 @@ where $N$ is the total number of observations.
 The table below (Table 1) shows the RMSE values for the Hawkes and Recursive models, with respect to every simulated forecast during the outbreak.
 
 ```{r}
-caption <- paste0("RMSE values for Hawkes and Recursive Models for all simulations.")
+caption <- paste0("RMSE values for Hawkes and Recursive Models for all datasets.")
 df_rmse <- data.frame(
   "Hawkes" = c(rmse_h7, rmse_h14, rmse_h21),
   "Recursive" = c(rmse_r7, rmse_r14, rmse_r21)
@@ -215,21 +215,21 @@ rpreds_o <- t(rproj_omit %>% select(pred.7,pred.14,pred.21))
 ## Hawkes Analysis
 
 ```{r}
-title <- paste0("Figure ",fig,": Hawkes 7-Day Forecasts for Refined Simulations")
+title <- paste0("Figure ",fig,": Hawkes 7-Day Forecasts for Refined Datasets")
 fig <- fig + 1
 mod7h <- single_forecast(hdates_o, hpreds_o, days = 7, title = title)
 mod7h$plot
 ```
 
 ```{r}
-title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for Refined Simulations")
+title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for Refined Datasets")
 fig <- fig + 1
 mod14h <- single_forecast(hdates_o, hpreds_o, days = 14, title = title)
 mod14h$plot
 ```
 
 ```{r}
-title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for Refined Simulations")
+title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for Refined Datasets")
 fig <- fig + 1
 mod21h <- single_forecast(hdates_o, hpreds_o, days = 21, title = title)
 mod21h$plot
@@ -239,28 +239,28 @@ mod21h$plot
 ## Recursive Analysis
 
 ```{r}
-title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for Refined Simulations")
+title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for Refined Datasets")
 fig <- fig + 1
 mod7r <- single_forecast(rdates_o, rpreds_o, days = 7, title = title)
 mod7r$plot
 ```
 
 ```{r}
-title <- paste0("Figure ",fig,": Recursive 14-Day Forecasts for Refined Simulations")
+title <- paste0("Figure ",fig,": Recursive 14-Day Forecasts for Refined Datasets")
 fig <- fig + 1
 mod14r <- single_forecast(rdates_o, rpreds_o, days = 14, title = title)
 mod14r$plot
 ```
 
 ```{r}
-title <- paste0("Figure ",fig,": Recursive 21-Day Forecasts for Refined Simulations")
+title <- paste0("Figure ",fig,": Recursive 21-Day Forecasts for Refined Datasets")
 fig <- fig + 1
 mod21r <- single_forecast(rdates_o, rpreds_o, days = 21, title = title)
 mod21r$plot
 ```
 
 ```{r}
-caption <- paste0("RMSE values for Hawkes and Recursive Models for refined simulations.")
+caption <- paste0("RMSE values for Hawkes and Recursive Models for refined dataests.")
 df_rmse <- data.frame(
   "Hawkes" = c(mod7h$rmse, mod14h$rmse, mod21h$rmse),
   "Recursive" = c(mod7r$rmse, mod14r$rmse, mod21r$rmse)
