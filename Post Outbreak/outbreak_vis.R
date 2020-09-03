@@ -14,120 +14,6 @@ add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 
 ######################################################################################################################
 
-## The full_forecast function plots the result from a single Hawkes forecast 
-## with respect to the entire outbreak.
-
-## This function requires the ggplot() object p to be declared
-
-full_forecast <- function(rdate, forecast) {
-  Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
-  df <- data.frame(Prediction, forecast)
-  
-  corresp_total <- true$total[true$date == as.Date(rdate)] # running total on that date
-  
-  p + geom_point(
-    data = df, 
-    mapping = aes(
-      x = as.Date(rdate) + c(7,14,21),
-      y = corresp_total + forecast,
-      col = Prediction
-    ),
-    size = 2.3
-  ) + theme(legend.position = "bottom")
-}
-
-######################################################################################################################
-
-## The plot_forecast function plots the result from a single Hawkes forecast with respect to the cases 
-## up to the forecasted days +/- 28.
-
-### THIS FUNCTION IS OBSOLETE. USE multi_forecast() INSTEAD ###
-
-plot_forecast <- function(rdate, forecast, data = true) {
-  Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
-  df <- data.frame(Prediction, forecast)
-  corresp_total <- data$total[data$date == as.Date(rdate)] # running total on that date
-  g <- ggplot(
-    data = data[data$date < as.Date(rdate) + 28,], #an extra week past the last day for readability
-    mapping = aes(x = date, y = total)
-  ) + 
-    geom_line() + 
-    theme_light() + 
-    geom_vline(aes(xintercept = as.Date(rdate)), col = "navy") #line at the date
-  
-  g + geom_point(
-    data = df, 
-    mapping = aes(
-      x = as.Date(rdate)+c(7,14,21),
-      y = corresp_total + forecast, 
-      col = Prediction
-    ),
-    size = 2.3
-  ) + theme(legend.position = "bottom")
-}
-
-######################################################################################################################
-
-## Function that accepts a vector of dates (date_vec) and 
-## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat).
-## The title argument is the title for the corresponding plot.
-## The function returns a visualization of confirmed cases vs
-## the Hawkes model projections.
-## The matrix of forecasted values is organized BY COLUMN. Each column in forecast_mat is a 3x1 vector.
-## This function can do the same thing as plot_forecast() and return the results from one forecast, 
-## but is also optimized to plot multiple forecasts.
-
-## NOTE: if you are just visualizing a single forecast, you DO NOT 
-## need to cbind() your projections in forecast_mat, just the vector is enough.
-
-multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL, refined = FALSE) {
-  
-  Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
-  
-  l <- length(date_vec)
-  max_date <- max(ymd(date_vec)) #latest date using lubridate
-  min_date <- min(ymd(date_vec)) #latest date using lubridate
-  date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
-  forc_dates <- lapply(date_vecl, add_weeks) # add c(7,14,21) days to each date
-  l2 <- length(forc_dates)
-  
-  date_list <- c()
-  for(i in 1:l2) {
-    date_list <- c(date_list,as.list(forc_dates[[i]])) 
-    #group all dates into their own list
-  } 
-  dfdate <- t(data.frame(date_list)) #data.frame to preserve date structure
-  
-  total_vec <- rep(NA, l)
-  for(i in seq_len(l)) {
-    total_vec[i] <- data$total[data$date == as.Date(date_vec[i])]
-  } #generating cumulative case counts for each desired day
-  
-  forecast_total <- t(t(forecast_mat) + total_vec) # adding forecasted values to cumulative totals
-  forecast_total <- as.vector(forecast_total)
-  df <- data.frame(dfdate, forecast_total, Prediction) # data frame for ggplot
-
-  g <- ggplot(
-    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
-    mapping = aes(x = date, y = total)
-  ) + 
-    geom_line() + 
-    theme_light() + 
-    geom_vline(xintercept = as.Date(date_vec), col = "navy") #line at the dates
-
-  g + geom_point(
-    data = df,
-    mapping = aes(
-      x = as.Date(dfdate),
-      y = forecast_total,
-      col = Prediction
-    ),
-    size = 2.7
-  ) + theme(legend.position = "bottom") + labs(title = title)
-}
-
-######################################################################################################################
-
 ## Function that accepts a vector of dates (date_vec) and 
 ## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
 ## as well as the number of forecasted days you want to visualize (days).
@@ -243,7 +129,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       linetype = "dashed",
       size = size - 2.2
     ) #no point markers, but trend line is dashed
- 
+  
   if(res == TRUE) { # CREATES ADDITIONAL OUTPUT BY CALCULATING RMSE AND GIVES RESULTS DATA FRAME
     if(days == 7) {
       fdate <- as.Date(date_vec) + 7 #add 7 for 7-day forecast
@@ -354,4 +240,91 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
     return(gfull)
   }
 }
+
+
+######################################################################################################################
+
+## The full_forecast function plots the result from a single Hawkes or Recursive forecast 
+## with respect to the entire outbreak.
+
+## This function requires the ggplot() object p to be declared
+
+full_forecast <- function(rdate, forecast) {
+  Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
+  df <- data.frame(Prediction, forecast)
+  
+  corresp_total <- true$total[true$date == as.Date(rdate)] # running total on that date
+  
+  p + geom_point(
+    data = df, 
+    mapping = aes(
+      x = as.Date(rdate) + c(7,14,21),
+      y = corresp_total + forecast,
+      col = Prediction
+    ),
+    size = 2.3
+  ) + theme(legend.position = "bottom")
+}
+
+
+######################################################################################################################
+
+## Function that accepts a vector of dates (date_vec) and 
+## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat).
+## The title argument is the title for the corresponding plot.
+## The function returns a visualization of confirmed cases vs
+## the Hawkes model projections.
+## The matrix of forecasted values is organized BY COLUMN. Each column in forecast_mat is a 3x1 vector.
+## This function can do the same thing as plot_forecast() and return the results from one forecast, 
+## but is also optimized to plot multiple forecasts.
+
+## NOTE: if you are just visualizing a single forecast, you DO NOT 
+## need to cbind() your projections in forecast_mat, just the vector is enough.
+
+multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL, refined = FALSE) {
+  
+  Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
+  
+  l <- length(date_vec)
+  max_date <- max(ymd(date_vec)) #latest date using lubridate
+  min_date <- min(ymd(date_vec)) #latest date using lubridate
+  date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
+  forc_dates <- lapply(date_vecl, add_weeks) # add c(7,14,21) days to each date
+  l2 <- length(forc_dates)
+  
+  date_list <- c()
+  for(i in 1:l2) {
+    date_list <- c(date_list,as.list(forc_dates[[i]])) 
+    #group all dates into their own list
+  } 
+  dfdate <- t(data.frame(date_list)) #data.frame to preserve date structure
+  
+  total_vec <- rep(NA, l)
+  for(i in seq_len(l)) {
+    total_vec[i] <- data$total[data$date == as.Date(date_vec[i])]
+  } #generating cumulative case counts for each desired day
+  
+  forecast_total <- t(t(forecast_mat) + total_vec) # adding forecasted values to cumulative totals
+  forecast_total <- as.vector(forecast_total)
+  df <- data.frame(dfdate, forecast_total, Prediction) # data frame for ggplot
+
+  g <- ggplot(
+    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
+    mapping = aes(x = date, y = total)
+  ) + 
+    geom_line() + 
+    theme_light() + 
+    geom_vline(xintercept = as.Date(date_vec), col = "navy") #line at the dates
+
+  g + geom_point(
+    data = df,
+    mapping = aes(
+      x = as.Date(dfdate),
+      y = forecast_total,
+      col = Prediction
+    ),
+    size = 2.7
+  ) + theme(legend.position = "bottom") + labs(title = title)
+}
+
 ######################################################################################################################
