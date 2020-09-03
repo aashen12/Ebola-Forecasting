@@ -14,12 +14,15 @@ add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 
 ######################################################################################################################
 
+### MAIN FUNCTION ###
+
 ## Function that accepts a vector of dates (date_vec) and 
 ## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
 ## as well as the number of forecasted days you want to visualize (days).
 ## Each column of forecast_mat must contain the c(7-day projection, 14-day projection, 21-day projection)
-## The data argument accepts a data frame with the corresponding data.
-## The res argument decides whether to output results along with a plot. Returns just the plot by default.
+## The data argument accepts a data frame with the dataset representing the true case count (solid black line in ggplot).
+## The res argument decides whether to output table of results and RMSE value, along with a plot. Returns just the plot by default.
+## The point argument decides whether you want your ggplot to have points at each date or just a smooth line.
 ## The title argument is the title for the corresponding plot.
 ## The same inputs as multi_forecast().
 ## But it returns the x-day forecasts for all dates specified, where x is either
@@ -28,7 +31,7 @@ add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 ## the Hawkes model projections for that indicated day.
 
 single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = TRUE, point = FALSE) {
-  size <- 3.0
+  size <- 3.0 #point size
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
   min_date <- min(ymd(date_vec)) #latest date using lubridate
@@ -65,14 +68,15 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
   # this recycles, so order is very important here!
   df <- data.frame(dfdate, forecast_total) # data frame for ggplot
   
+  #complete ggplot with all points, WITH VERTICAL LINE AT DATES, THIS GRAPH CONTAINS EVERYTHING
   gfull <- ggplot(
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),], #range is 28 days ahead and 14 days behind
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
     theme_light() + 
-    geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at the dates
-    geom_point(
+    geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at each date forecasted
+    geom_point( #adds points at each date
       data = df,
       mapping = aes(
         x = as.Date(dfdate),
@@ -82,21 +86,23 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       size = size
     ) +
     theme(legend.position = "bottom") + labs(title = title) +
-    geom_path(
+    geom_path( #no dashed line here
       data = df,
       aes(x = as.Date(dfdate), y = forecast_total),
       color = col,
       #linetype = "dashed",
       size = size - 2.2
-    ) #complete ggplot with all points, WITH VERTICAL LINE AT DATES
+    ) 
   
+  
+  #Plot with no vertical lines at dates, CONTAINS POINTS AT EACH FORECASTED DATE INSTEAD OF JUST A DASHED LINE
   gfull_ref <- ggplot( 
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
     theme_light() + 
-    #geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at the dates
+    #geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  # NO line at the dates
     geom_point(
       data = df,
       mapping = aes(
@@ -113,8 +119,9 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       #linetype = "dashed",
       size = 0.65
-    ) #no vertical lines, CONTAINS POINTS AT EACH FORECASTED DATE
+    ) 
   
+  #Graph with NO point markers, and trend line is dashed
   gsimp <- ggplot(
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
@@ -128,9 +135,9 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       linetype = "dashed",
       size = size - 2.2
-    ) #no point markers, but trend line is dashed
+    ) 
   
-  if(res == TRUE) { # CREATES ADDITIONAL OUTPUT BY CALCULATING RMSE AND GIVES RESULTS DATA FRAME
+  if(res == TRUE) { # CREATES ADDITIONAL OUTPUT BY CALCULATING RMSE AND GIVES DATA FRAME OF RESULTS
     if(days == 7) {
       fdate <- as.Date(date_vec) + 7 #add 7 for 7-day forecast
       actual <- rep(NA,length(fdate))
