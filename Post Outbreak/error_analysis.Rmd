@@ -1,14 +1,16 @@
 ---
 title: "Ebola Forecasting - Error Analysis"
 author: "Frederic Schoenberg, Sarita Lee, Andy Shen"
-output: pdf_document
+output: 
+  pdf_document:
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-# 1 Data Input and Cleaning
+# Data Input and Cleaning
 
 
 We assume the most accurate dataset is the most recent dataset of the outbreak. We tally the cases such that there is a running total of infections at each date. This dataset represents the true number of cases at any given point during the outbreak.
@@ -58,7 +60,7 @@ rownames(hproj) <- 1:nrow(hproj)
 ```
 
 
-# 2 Hawkes Complete Outbreak Analysis
+# Hawkes Complete Outbreak Analysis
 
 ## 7-Day Forecast Analysis
 
@@ -109,7 +111,7 @@ The 21-day Hawkes projections follow a similar pattern as 14-day Hawkes projecti
 
 \pagebreak
 
-# 3 Recursive Complete Outbreak Analysis
+# Recursive Complete Outbreak Analysis
 
 ## 7-Day Forecast Analysis
 
@@ -159,7 +161,7 @@ Similar to the 14-day forecasts, the 21-day Recursive forecasts tend to under-pr
 
 \pagebreak
 
-# 4 RMSE for Full Hawkes and Recursive Forecasts
+# RMSE for Full Hawkes and Recursive Forecasts
 
 We compute the Root Mean Square Error (RMSE) of the 7, 14, and 21-day forecasts for both the Hawkes and Recursive models. The RMSE is computed as
 
@@ -188,7 +190,7 @@ We see that the Hawkes model forecasts have a consistently lower RMSE than those
 
 \pagebreak
 
-# 5 Omission of Repeated Entries
+# Omission of Repeated Entries
 
 Many of the forecasts were run with the same date. These extra runs are likely due to minor adjustments in the previously recorded data, so we refine our data to omit any repeated forecasts and only consider the most recent forecast with a repeated date. Therefore, for multiple forecasts that ended on the same date, we select the entry furthest down in the dataset, as it denotes the set with the most recent numbers.
 
