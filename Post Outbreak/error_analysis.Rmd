@@ -161,7 +161,7 @@ Similar to the 14-day forecasts, the 21-day Recursive forecasts tend to under-pr
 
 \pagebreak
 
-# RMSE for Full Hawkes and Recursive Forecasts
+# RMSE for Full Hawkes and Recursive Datasets
 
 We compute the Root Mean Square Error (RMSE) of the 7, 14, and 21-day forecasts for both the Hawkes and Recursive models. The RMSE is computed as
 
