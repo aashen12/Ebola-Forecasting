@@ -280,7 +280,7 @@ full_forecast <- function(rdate, forecast) {
 ## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat).
 ## The title argument is the title for the corresponding plot.
 ## The function returns a visualization of confirmed cases vs
-## the Hawkes model projections.
+## the model projections.
 ## The matrix of forecasted values is organized BY COLUMN. Each column in forecast_mat is a 3x1 vector.
 ## This function can do the same thing as plot_forecast() and return the results from one forecast, 
 ## but is also optimized to plot multiple forecasts.
