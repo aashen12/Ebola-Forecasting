@@ -282,8 +282,6 @@ full_forecast <- function(rdate, forecast) {
 ## The function returns a visualization of confirmed cases vs
 ## the model projections.
 ## The matrix of forecasted values is organized BY COLUMN. Each column in forecast_mat is a 3x1 vector.
-## This function can do the same thing as plot_forecast() and return the results from one forecast, 
-## but is also optimized to plot multiple forecasts.
 
 ## NOTE: if you are just visualizing a single forecast, you DO NOT 
 ## need to cbind() your projections in forecast_mat, just the vector is enough.
