@@ -35,7 +35,7 @@ hproj$date_last_case <- mdy(hproj$date_last_case)
 
 # Actual Recorded DRC Ebola Cases
 
-```{r,include=FALSE}
+```{r,include=T}
 plot(true$date, true$total, type = "l", lwd = 3,
      xlab = "Date", ylab = "Total Cases",
      main = "Actual Recorded DRC Ebola Cases")
