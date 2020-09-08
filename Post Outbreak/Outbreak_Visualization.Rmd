@@ -46,7 +46,9 @@ rownames(hproj) <- 1:nrow(hproj)
 ```
 
 ```{r}
+ind <- 1:2
 single_forecast(hdates, hpreds, days = 7,  title = NULL, res = F, point = T)
+multi_forecast(hdates[ind], hpreds[,ind])
 ```
 
 
