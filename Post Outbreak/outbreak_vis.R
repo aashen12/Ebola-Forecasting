@@ -244,10 +244,163 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
     }
   } 
   else {
-    return(gfull)
+    if(point == TRUE) { # IF YOU WANT THE PLOT WITH POINTS OR A DASHED LINE
+      return(gfull_ref)
+    } else {
+      return(gsimp)
+    }
   }
 }
 
+######################################################################################################################
+## Function that takes the same inputs as single_forecast() and 
+## returns only the RMSE value.
+
+forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = true) {
+  l <- length(date_vec)
+  max_date <- max(ymd(date_vec)) #latest date using lubridate
+  min_date <- min(ymd(date_vec)) #latest date using lubridate
+  date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
+  
+  if(days == 7) {
+    forecast_vec <- forecast_mat[1,] # 7 day projections are row 1 of matrix
+    forc_dates <- lapply(date_vecl, add_7) # add 7 days to each date
+    col <- "dodgerblue1"
+  } else if(days == 14) {
+    forecast_vec <- forecast_mat[2,] # 14 day projections are row 2
+    forc_dates <- lapply(date_vecl, add_14) # add 14 days to each date
+    col <- "red2"
+  } else {
+    forecast_vec <- forecast_mat[3,] # 21 day projections are row 3
+    forc_dates <- lapply(date_vecl, add_21) # add 21 days to each date
+    col <- "forestgreen"
+  }
+  
+  l2 <- length(forc_dates)
+  date_list <- rep(NA, l2)
+  for(i in 1:l2) {
+    date_list[i] <- as.list(forc_dates[[i]]) #group all dates into their own list
+  } 
+  dfdate <- t(data.frame(date_list)) #data.frame to preserve date structure
+  
+  total_vec <- rep(NA, l)
+  for(i in seq_len(l)) {
+    total_vec[i] <- data$total[data$date == as.Date(date_vec[i])]
+  } #generating cumulative case counts for each desired day
+  
+  forecast_total <- forecast_vec + total_vec # adding forecasted values to cumulative totals
+  # this recycles, so order is very important here!
+  df <- data.frame(dfdate, forecast_total) # data frame for ggplot
+
+  if(days == 7) {
+    fdate <- as.Date(date_vec) + 7 #add 7 for 7-day forecast
+    actual <- rep(NA,length(fdate))
+    for(i in 1:length(fdate)) {
+      if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
+        actual[i] <- NA # accounting for blank arguments
+      } else{
+        actual[i] <- data$total[data$date == as.Date(fdate[i])]
+      }
+    } #record the actual number of cases for the given increment (days)
+    
+    df_show <- data.frame(
+      cbind(
+        date_vec, #vector of input dates
+        total_vec, #total number of cases on that date
+        dfdate, # +7 days from date_vec
+        actual, #actual number of cases on that day
+        total_vec + forecast_mat[1,] #forecasted total
+      )
+    )
+    row.names(df_show) <- 1:nrow(df_show)
+    colnames(df_show) <- c("prior.date","prior.total","forecast.date","actual.total","forecast.total")
+    df_show$prior.total <- as.numeric(df_show$prior.total)
+    df_show$actual.total <- as.numeric(df_show$actual.total)
+    df_show$forecast.total <- as.numeric(df_show$forecast.total)
+    df_show <- df_show %>% mutate(
+      resids = actual.total - forecast.total
+    ) 
+    RMSE <- df_show %>% summarise(
+      RMSE = sqrt( mean(na.omit(resids)^2) )
+    )
+    RMSE <- RMSE[1,1]
+    RMSE2<-Metrics::rmse(df_show$actual.total,df_show$forecast.total) #built-in
+    if(RMSE == RMSE2) {
+      return(RMSE)
+    } else{
+      cat("RMSE does not match")
+    }
+  } 
+  else if(days == 14) {
+    fdate <- as.Date(date_vec) + 14
+    actual <- rep(NA,length(fdate))
+    for(i in 1:length(fdate)) {
+      if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
+        actual[i] <- NA # accounting for blank arguments
+      } else{
+        actual[i] <- data$total[data$date == as.Date(fdate[i])]
+      }
+    } #record the actual number of cases for the given increment (days)
+    
+    df_show <- data.frame(
+      cbind(
+        date_vec,
+        total_vec,
+        dfdate,
+        actual,
+        total_vec + forecast_mat[2,]
+      )
+    )
+    row.names(df_show) <- 1:nrow(df_show)
+    colnames(df_show) <- c("prior.date","prior.total","forecast.date","actual.total","forecast.total")
+    df_show$prior.total <- as.numeric(df_show$prior.total)
+    df_show$actual.total <- as.numeric(df_show$actual.total)
+    df_show$forecast.total <- as.numeric(df_show$forecast.total)
+    df_show <- df_show %>% mutate(
+      resids = actual.total - forecast.total
+    )
+    RMSE <- df_show %>% summarise(
+      RMSE = sqrt( mean(na.omit(resids)^2) )
+    )
+    RMSE <- RMSE[1,1]
+    return(RMSE)
+  }
+  else {
+    fdate <- as.Date(date_vec) + 21
+    actual <- rep(NA,length(fdate))
+    for(i in 1:length(fdate)) {
+      if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
+        actual[i] <- NA # accounting for blank arguments
+      } else{
+        actual[i] <- data$total[data$date == as.Date(fdate[i])]
+      }
+    }#record the actual number of cases for the given increment (days)
+    
+    df_show <- data.frame(
+      cbind(
+        date_vec,
+        total_vec,
+        dfdate,
+        actual,
+        total_vec + forecast_mat[3,]
+      )
+    )
+    row.names(df_show) <- 1:nrow(df_show)
+    colnames(df_show) <- c("prior.date","prior.total","forecast.date","actual.total","forecast.total")
+    df_show$prior.total <- as.numeric(df_show$prior.total)
+    df_show$actual.total <- as.numeric(df_show$actual.total)
+    df_show$forecast.total <- as.numeric(df_show$forecast.total)
+    df_show <- df_show %>% mutate(
+      resids = actual.total - forecast.total
+    )
+    RMSE <- df_show %>% summarise(
+      RMSE = sqrt( mean(na.omit(resids)^2) )
+    )
+    RMSE <- RMSE[1,1] #calculate rmse
+    return(RMSE)
+  }  #21 DAYS
+
+}
 
 ######################################################################################################################
 
@@ -261,7 +414,9 @@ full_forecast <- function(rdate, forecast) {
   df <- data.frame(Prediction, forecast)
   
   corresp_total <- true$total[true$date == as.Date(rdate)] # running total on that date
-  
+  p <- ggplot(data = true, mapping = aes(x = date, y = total)) + 
+    geom_line() + theme_light() + 
+    labs(title = "Actual Recorded DRC Ebola Cases")# graph of running total of cases
   p + geom_point(
     data = df, 
     mapping = aes(
@@ -272,7 +427,6 @@ full_forecast <- function(rdate, forecast) {
     size = 2.3
   ) + theme(legend.position = "bottom")
 }
-
 
 ######################################################################################################################
 
