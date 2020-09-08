@@ -440,7 +440,7 @@ full_forecast <- function(rdate, forecast) {
 ## NOTE: if you are just visualizing a single forecast, you DO NOT 
 ## need to cbind() your projections in forecast_mat, just the vector is enough.
 
-multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL, refined = FALSE) {
+multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
   
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   
