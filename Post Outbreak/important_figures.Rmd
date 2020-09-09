@@ -87,7 +87,8 @@ ggplot(
   geom_path(
     data = true, 
     mapping = aes(x = date, y = seven_day_avg),
-    color = "black"
+    color = "black",
+    size = 0.75
   ) + labs(title = title) + theme(legend.position = "bottom")
 ```
 
