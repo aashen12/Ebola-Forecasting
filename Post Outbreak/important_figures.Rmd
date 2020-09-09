@@ -89,7 +89,7 @@ ggplot(
     mapping = aes(x = date, y = seven_day_avg),
     color = "black",
     size = 0.75
-  ) + labs(title = title) + theme(legend.position = "bottom")
+  ) + labs(title = title)
 ```
 
 \pagebreak
