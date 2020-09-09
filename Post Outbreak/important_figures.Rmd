@@ -73,6 +73,7 @@ ggplot(
 
 ```{r}
 true <- true %>% mutate(seven_day_avg = zoo::rollmean(cases, k = 7,fill = NA))
+# add rolling average
 ```
 
 
