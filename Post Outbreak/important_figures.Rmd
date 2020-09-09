@@ -63,11 +63,14 @@ print(rpreds3 <- rpreds[,indr])
 # Full Outbreak
 
 ```{r}
+title <- paste0(" Cumulative Ebola Cases by Day in West Africa")
 ggplot(
   data = true,
   mapping = aes(x = date, y = total)
-) + geom_line() + theme_light()
+) + geom_line() + theme_light() + labs(title = title)
 ```
+
+\pagebreak
 
 # New Cases by Day
 
