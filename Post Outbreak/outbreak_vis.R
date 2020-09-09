@@ -238,9 +238,9 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       RMSE <- RMSE[1,1] #calculate rmse
     }  #21 DAYS
     if(point == TRUE) { # IF YOU WANT THE PLOT WITH POINTS OR A DASHED LINE
-      return(list(results = df_show, rmse = RMSE, plot = gfull_ref)) #plot with points marking forecast projections
+      return(list(plot = gfull_ref, results = df_show, rmse = RMSE)) #plot with points marking forecast projections
     } else {
-      return(list(results = df_show, rmse = RMSE, plot = gsimp)) # no points, just a dashed line
+      return(list(plot = gsimp, results = df_show, rmse = RMSE)) # no points, just a dashed line
     }
   } 
   else {
