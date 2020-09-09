@@ -49,11 +49,11 @@ rownames(hproj) <- 1:nrow(hproj)
 # Dataset Selection
 
 ```{r}
-hr3 <- c("2018-08-26","2019-07-26","2020-02-06")
+hr3 <- c("2018-08-26","2019-07-26","2020-02-06") #selection of datasets
 ```
 
 ```{r}
-indh <- indr <- c(2,149,161) #corresponding indices for above dates
+indh <- indr <- c(2,149,161) #corresponding indices for above dates, done manually
 print(hpreds3 <- hpreds[,indh])
 print(rpreds3 <- rpreds[,indr])
 ```
