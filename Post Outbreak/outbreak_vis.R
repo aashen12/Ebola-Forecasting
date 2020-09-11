@@ -85,14 +85,15 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       color = col,
       size = size
     ) +
-    theme(legend.position = "bottom") + labs(title = title) +
+    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5)) + 
+    labs(caption = title) +
     geom_path( #no dashed line here
       data = df,
       aes(x = as.Date(dfdate), y = forecast_total),
       color = col,
       #linetype = "dashed",
       size = size - 2.2
-    ) 
+    ) + scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
   
   
   #Plot with no vertical lines at dates, CONTAINS POINTS AT EACH FORECASTED DATE INSTEAD OF JUST A DASHED LINE
@@ -111,15 +112,16 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       ),
       color = col,
       size = 2.5
-    ) +
-    theme(legend.position = "bottom") + labs(title = title) +
+    ) + 
+    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5)) + 
+    labs(caption = title) +
     geom_path(
       data = df,
       aes(x = as.Date(dfdate), y = forecast_total),
       color = col,
       #linetype = "dashed",
       size = 0.65
-    ) 
+    ) + scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
   
   #Graph with NO point markers, and trend line is dashed
   gsimp <- ggplot(
@@ -128,14 +130,16 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
   ) + 
     geom_line() + #line for true forecasts
     theme_light() + 
-    theme(legend.position = "bottom") + labs(title = title) +
+    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5)) + 
+    labs(caption = title) +
     geom_path(
       data = df,
       aes(x = as.Date(dfdate), y = forecast_total),
       color = col,
       linetype = "dashed",
       size = size - 2.2
-    ) 
+    ) + scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
+  
   
   if(res == TRUE) { # CREATES ADDITIONAL OUTPUT BY CALCULATING RMSE AND GIVES DATA FRAME OF RESULTS
     if(days == 7) {

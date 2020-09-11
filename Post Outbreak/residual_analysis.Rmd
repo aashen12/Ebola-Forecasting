@@ -1,7 +1,7 @@
 ---
-title: "Ebola Forecasting - Important Figures"
+title: "Ebola Forecasting - Residual Analysis"
 author: "Andy Shen"
-date: "9/9/2020"
+date: "9/11/2020"
 output: 
   pdf_document:
     number_sections: true
@@ -29,7 +29,7 @@ rproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2
 rproj <- rproj %>% select(date_last_case, pred.7, pred.14, pred.21) 
 rproj$date_last_case <- mdy(rproj$date_last_case)
 rproj <- na.omit(rproj) # some dates have no projections
-rproj <- rproj %>% distinct()
+#rproj <- rproj %>% distinct()
 rownames(rproj) <- 1:nrow(rproj)
 rdates <- as.character(rproj$date_last_case)
 rpreds <- t(rproj %>% select(pred.7,pred.14,pred.21))
@@ -42,133 +42,57 @@ hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2
 hproj <- hproj %>% select(date_last_case, pred.7, pred.14, pred.21) #selecting only the cols with forecasts
 hproj$date_last_case <- mdy(hproj$date_last_case)
 hproj <- hproj[-omit_h,] #omit the rows that aren't also in recursive
-hproj <- hproj %>% distinct()
+#hproj <- hproj %>% distinct()
 hdates <- as.character(hproj$date_last_case) #for working with dates
 hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21)) #take t() for the function
 rownames(hproj) <- 1:nrow(hproj)
 ```
 
-
-# Dataset Selection
-
-```{r}
-hr3 <- c("2018-08-26","2019-07-26","2020-02-06") #selection of datasets
-```
-
-```{r}
-indh <- indr <- c(2,149,161) #corresponding indices for above dates, done manually
-print(hpreds3 <- hpreds[,indh])
-print(rpreds3 <- rpreds[,indr])
-```
-
-\pagebreak
-
 # Full Outbreak
 
-```{r,fig.cap="Cumulative Ebola Cases by Day in West Africa"}
+```{r}
 title <- paste0("Cumulative Ebola Cases by Day in West Africa")
-p <- ggplot(
+overall <- ggplot(
   data = true,
   mapping = aes(x = date, y = total)) + 
   geom_line() + theme_light() + labs(caption = title) + 
   theme(plot.caption = element_text(hjust = 0.5)) +
   scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
-p #+ theme(panel.grid.minor = element_blank())
+overall #+ theme(panel.grid.minor = element_blank())
 #ggsave("test.png",p,width = 6, height = 4, units="in")
 ```
 
-\pagebreak
 
-# New Cases by Day
+# Residual Analysis
 
-```{r}
-true <- true %>% mutate(seven_day_avg = zoo::rollmean(cases, k = 7,fill = NA))
-# add rolling average
-```
-
-
-
-```{r,warning=FALSE}
-title <- paste0("Ebola Cases by Day in West Africa with 7-day Rolling Average")
-ggplot(
-  data = true,
-  mapping = aes(x = date, y = cases)
-) + geom_col(color = "lightblue") + theme_light() + 
-  geom_path(
-    data = true, 
-    mapping = aes(x = date, y = seven_day_avg),
-    color = "black",
-    size = 0.75
-  ) + labs(caption = title) + 
-  theme(plot.caption = element_text(hjust = 0.5))
-  scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
-```
-
-\pagebreak
-
-# Hawkes Forecasts
-
-## Hawkes 7-Day
+## With ggplot
 
 ```{r}
-print(h7 <- single_forecast(hr3, hpreds3, days = 7, point = T))
-```
-
-\pagebreak
-
-## Hawkes 14-Day
-
-```{r}
-print(h14 <- single_forecast(hr3, hpreds3, days = 14, point = T))
-```
-
-\pagebreak
-
-## Hawkes 21-Day
-
-```{r}
-print(h21 <- single_forecast(hr3, hpreds3, days = 21, point = T))
-```
-
-
-\pagebreak
-
-# Recursive Forecasts
-
-## Recursive 7-Day
-
-```{r}
-print(r7 <- single_forecast(hr3, rpreds3, days = 7, point = T))
-```
-
-\pagebreak
-
-## Recursive 14-Day
-
-```{r}
-print(r14 <- single_forecast(hr3, rpreds3, days = 14, point = T))
-```
-
-\pagebreak
-
-## Recursive 21-Day
-
-```{r}
-print(r21 <- single_forecast(hr3, rpreds3, days = 21, point = T))
-```
-
-\pagebreak
-
-# RMSE
-
-```{r,echo=FALSE}
-caption <- paste0("RMSE values for 3 selected datasets.")
-df_rmse <- data.frame(
-  "Hawkes" = c(h7$rmse, h14$rmse, h21$rmse),
-  "Recursive" = c(r7$rmse, r14$rmse, r21$rmse)
+cap <- paste0("Residual plot of Hawkes and Recursive 7-day models")
+h7 <- (single_forecast(hdates, hpreds, days = 7)$results)
+r7 <- (single_forecast(rdates, rpreds, days = 7)$results)
+df <- data.frame(
+  date = h7$forecast.date,
+  hawkes = h7$resids,
+  recursive = r7$resids
 )
-row.names(df_rmse) <- c("7-day","14-day","21-day")
-tbl1<-df_rmse %>% knitr::kable(digits = 2, caption = caption) 
-tbl1
+df <- pivot_longer(df, cols = 2:3, names_to = "type", values_to = "resid")
+p <- ggplot(
+  data = true,
+  mapping = aes(x = date, y = total)
+) + 
+  theme_bw() + labs(caption = cap) + 
+  theme(plot.caption = element_text(hjust = 0.5), legend.position = "bottom") +
+  scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") + 
+  geom_hline(aes(yintercept=0))
+  
+p + geom_point(
+  data = df,
+  mapping = aes(x = as.Date(date), y = resid, color = type)
+)
 ```
+
+\pagebreak
+
+
 
