@@ -65,7 +65,7 @@ overall #+ theme(panel.grid.minor = element_blank())
 
 # Residual Analysis
 
-## With ggplot
+## Hawkes vs Recursive 7-Day
 
 ```{r}
 cap <- paste0("Residual plot of Hawkes and Recursive 7-day models")
@@ -76,23 +76,88 @@ df <- data.frame(
   hawkes = h7$resids,
   recursive = r7$resids
 )
-df <- pivot_longer(df, cols = 2:3, names_to = "type", values_to = "resid")
+df <- pivot_longer(df, cols = 2:3, names_to = "forecast", values_to = "resid")
 p <- ggplot(
   data = true,
   mapping = aes(x = date, y = total)
 ) + 
-  theme_bw() + labs(caption = cap) + 
+  theme_bw() + 
   theme(plot.caption = element_text(hjust = 0.5), legend.position = "bottom") +
   scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") + 
   geom_hline(aes(yintercept=0))
   
 p + geom_point(
   data = df,
-  mapping = aes(x = as.Date(date), y = resid, color = type)
-)
+  mapping = aes(x = as.Date(date), y = resid, color = forecast)
+) + labs(caption = cap)
 ```
 
 \pagebreak
 
+## Hawkes-Only Residual Plot
+
+```{r,warning=F}
+cap <- paste0("Residual plot of Hawkes 7-, 14-, and 21-day models")
+# h7 already created
+h14 <- (single_forecast(hdates, hpreds, days = 14)$results)
+h21 <- (single_forecast(hdates, hpreds, days = 21)$results)
+
+p + labs(caption = cap) + 
+  geom_point(
+    data = h7, 
+    mapping = aes(x = as.Date(forecast.date), y = resids, col = "dodgerblue")
+  ) +   
+  geom_point(
+    data = h14, 
+    mapping = aes(x = as.Date(forecast.date), y = resids, col = "red2")
+  ) + 
+  geom_point(
+    data = h21, 
+    mapping = aes(x = as.Date(forecast.date), y = resids, col = "forestgreen")
+  ) + 
+  scale_color_identity(
+    name = "",
+    breaks = c("dodgerblue", "red2", "forestgreen"),
+    labels = c("7-day", "14-day", "21-day"),
+    guide = "legend"
+  )
+```
+
+\pagebreak
+
+## Recursive-Only Residual Plot
+
+```{r,warning=F}
+cap <- paste0("Residual plot of Recursive 7-, 14-, and 21-day models")
+# r7 already created
+r14 <- (single_forecast(rdates, rpreds, days = 14)$results)
+r21 <- (single_forecast(rdates, rpreds, days = 21)$results)
+
+p + labs(caption = cap) + 
+  geom_point(
+    data = r7, 
+    mapping = aes(x = as.Date(forecast.date), y = resids, col = "dodgerblue")
+  ) +   
+  geom_point(
+    data = r14, 
+    mapping = aes(x = as.Date(forecast.date), y = resids, col = "red2")
+  ) + 
+  geom_point(
+    data = r21, 
+    mapping = aes(x = as.Date(forecast.date), y = resids, col = "forestgreen")
+  ) + 
+  scale_color_identity(
+    name = "",
+    breaks = c("dodgerblue", "red2", "forestgreen"),
+    labels = c("7-day", "14-day", "21-day"),
+    guide = "legend"
+  )
+```
+
+\pagebreak
+
+# RMSE Calculation During Outbreak
+
+## Beginning of Outbreak
 
 
