@@ -332,7 +332,7 @@ forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = true) {
     if(RMSE == RMSE2) {
       return(RMSE)
     } else{
-      cat("RMSE does not match")
+      return(cat("RMSE does not match"))
     }
   } 
   else if(days == 14) {
