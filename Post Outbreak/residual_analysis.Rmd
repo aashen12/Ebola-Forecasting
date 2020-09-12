@@ -7,6 +7,10 @@ output:
     number_sections: true
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
 ```{r, include = FALSE}
 ## Complete Outbreak Dataset 
 ## Used to plot the true number of infections over time
@@ -48,24 +52,34 @@ hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21)) #take t() for the function
 rownames(hproj) <- 1:nrow(hproj)
 ```
 
-# Full Outbreak
+# New Ebola Cases by Day
 
-```{r}
-title <- paste0("Cumulative Ebola Cases by Day in West Africa")
-overall <- ggplot(
+The figure below shows the number of new Ebola cases in West Africa by day during the outbreak.
+
+```{r,warning=FALSE}
+true <- true %>% mutate(seven_day_avg = zoo::rollmean(cases, k = 7,fill = NA))
+title <- paste0("Ebola Cases by Day in West Africa with 7-day Rolling Average.\n Grey lines represent boundaries between the beginning, middle and end of the outbreak.")
+ggplot(
   data = true,
-  mapping = aes(x = date, y = total)) + 
-  geom_line() + theme_light() + labs(caption = title) + 
+  mapping = aes(x = date, y = cases)
+) + geom_col(color = "lightblue") + theme_classic() + 
+  geom_path(
+    data = true, 
+    mapping = aes(x = date, y = seven_day_avg),
+    color = "black",
+    size = 0.75
+  ) + labs(caption = title) + 
   theme(plot.caption = element_text(hjust = 0.5)) +
-  scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
-overall #+ theme(panel.grid.minor = element_blank())
-#ggsave("test.png",p,width = 6, height = 4, units="in")
+  scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") + 
+  geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
+  geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
 ```
 
 
-# Residual Analysis
+\pagebreak
 
-## Hawkes vs Recursive 7-Day
+
+# Hawkes vs Recursive 7-Day
 
 ```{r}
 cap <- paste0("Residual plot of Hawkes and Recursive 7-day models")
@@ -81,7 +95,7 @@ p <- ggplot(
   data = true,
   mapping = aes(x = date, y = total)
 ) + 
-  theme_bw() + 
+  theme_classic() + 
   theme(plot.caption = element_text(hjust = 0.5), legend.position = "bottom") +
   scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") + 
   geom_hline(aes(yintercept=0))
@@ -94,7 +108,7 @@ p + geom_point(
 
 \pagebreak
 
-## Hawkes-Only Residual Plot
+# Hawkes-Only Residual Plot
 
 ```{r,warning=F}
 cap <- paste0("Residual plot of Hawkes 7-, 14-, and 21-day models")
@@ -125,7 +139,7 @@ p + labs(caption = cap) +
 
 \pagebreak
 
-## Recursive-Only Residual Plot
+# Recursive-Only Residual Plot
 
 ```{r,warning=F}
 cap <- paste0("Residual plot of Recursive 7-, 14-, and 21-day models")
@@ -158,6 +172,51 @@ p + labs(caption = cap) +
 
 # RMSE Calculation During Outbreak
 
-## Beginning of Outbreak
+## Setup {#setup}
+
+We define the beginning, middle, and end of the outbreak such that the beginning is from May 3, 2018 to September 4, 2018; the middle from September 5, 2018 to August 25, 2019, and the end from August 26, 2019 to May 4, 2020.
+
+
+```{r, true case count}
+beg <- true[as.Date(true$date) <= as.Date("2018-09-04"),]
+mid <- true[(as.Date(true$date) > as.Date("2018-09-04")) & (as.Date(true$date) <= as.Date("2019-08-25")),]
+end <- true[as.Date(true$date) >= as.Date("2019-08-26"),]
+```
+```{r, Hawkes}
+hproj_beg <- hproj[as.Date(hproj$date_last_case) <= as.Date("2018-09-04"),]
+hproj_mid <- hproj[(as.Date(hproj$date_last_case) > as.Date("2018-09-04")) & (as.Date(hproj$date_last_case) <= as.Date("2019-08-25")),]
+hproj_end <- hproj[as.Date(hproj$date_last_case) >= as.Date("2019-08-26"),]
+```
+
+```{r, Recursive}
+rproj_beg <- rproj[as.Date(rproj$date_last_case) <= as.Date("2018-09-04"),]
+rproj_mid <- rproj[(as.Date(rproj$date_last_case) > as.Date("2018-09-04")) & (as.Date(rproj$date_last_case) <= as.Date("2019-08-25")),]
+rproj_end <- rproj[as.Date(rproj$date_last_case) >= as.Date("2019-08-26"),]
+```
+
+
+## RMSE Calculation
+
+The figure below shows the RMSE values from both the Hawkes and Recursive models during the beginning, middle, and end of the outbreak. The dates for each section are defined in section [5.1](#setup).
+
+
+```{r}
+cap <- paste0("7-Day Hawkes and Recursive RMSE values during the outbreak")
+rmse_df <- data.frame(
+  Hawkes = c(
+    forecast_rmse(hproj_beg$date_last_case, t(hproj_beg[,2:4]), days = 7),
+    forecast_rmse(hproj_mid$date_last_case, t(hproj_mid[,2:4]), days = 7),
+    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 7)
+  ),
+  Recursive = c(
+    forecast_rmse(rproj_beg$date_last_case, t(rproj_beg[,2:4]), days = 7),
+    forecast_rmse(rproj_mid$date_last_case, t(rproj_mid[,2:4]), days = 7),
+    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 7)   
+  )
+)
+rownames(rmse_df) <- c("Beginning","Middle","End")
+rmse_df %>% kable(digits = 2, caption = cap)
+```
+
 
 
