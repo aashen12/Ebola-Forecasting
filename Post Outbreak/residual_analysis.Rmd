@@ -58,7 +58,7 @@ The figure below shows the number of new Ebola cases in West Africa by day durin
 
 ```{r,warning=FALSE}
 true <- true %>% mutate(seven_day_avg = zoo::rollmean(cases, k = 7,fill = NA))
-title <- paste0("Ebola Cases by Day in West Africa with 7-day Rolling Average.\n Grey lines represent boundaries between the beginning, middle and end of the outbreak.")
+title <- paste0("Ebola Cases by Day in West Africa with 7-day Rolling Average.\n Grey lines represent boundaries between the beginning, middle and end of the outbreak (see section 5.1).")
 ggplot(
   data = true,
   mapping = aes(x = date, y = cases)
