@@ -52,13 +52,19 @@ hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21)) #take t() for the function
 rownames(hproj) <- 1:nrow(hproj)
 ```
 
+
+
+# Setup {#setup}
+
+We define the beginning, middle, and end of the outbreak such that the beginning is from May 3, 2018 to September 4, 2018, the middle from September 5, 2018 to August 25, 2019, and the end from August 26, 2019 to May 4, 2020.
+
 # New Ebola Cases by Day
 
-The figure below shows the number of new Ebola cases in West Africa by day during the outbreak.
+The figure below shows the number of new Ebola cases in West Africa by day during the outbreak. The grey lines represent boundaries between the beginning, middle and end of the outbreak (see section [1](#setup)).
 
 ```{r,warning=FALSE}
 true <- true %>% mutate(seven_day_avg = zoo::rollmean(cases, k = 7,fill = NA))
-title <- paste0("Ebola Cases by Day in West Africa with 7-day Rolling Average.\n Grey lines represent boundaries between the beginning, middle and end of the outbreak (see section 5.1).")
+title <- paste0("Ebola Cases by Day in West Africa with 7-day Rolling Average")
 ggplot(
   data = true,
   mapping = aes(x = date, y = cases)
@@ -75,11 +81,9 @@ ggplot(
   geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
 ```
 
-
 \pagebreak
 
-
-# Hawkes vs Recursive 7-Day
+# Hawkes vs Recursive 7-Day Residual Plot
 
 ```{r}
 cap <- paste0("Residual plot of Hawkes and Recursive 7-day models")
@@ -103,7 +107,9 @@ p <- ggplot(
 p + geom_point(
   data = df,
   mapping = aes(x = as.Date(date), y = resid, color = forecast)
-) + labs(caption = cap)
+) + labs(caption = cap) + 
+  geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
+  geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
 ```
 
 \pagebreak
@@ -134,7 +140,8 @@ p + labs(caption = cap) +
     breaks = c("dodgerblue", "red2", "forestgreen"),
     labels = c("7-day", "14-day", "21-day"),
     guide = "legend"
-  )
+  ) + geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
+  geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
 ```
 
 \pagebreak
@@ -165,16 +172,13 @@ p + labs(caption = cap) +
     breaks = c("dodgerblue", "red2", "forestgreen"),
     labels = c("7-day", "14-day", "21-day"),
     guide = "legend"
-  )
+  ) + geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
+  geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
 ```
 
 \pagebreak
 
 # RMSE Calculation During Outbreak
-
-## Setup {#setup}
-
-We define the beginning, middle, and end of the outbreak such that the beginning is from May 3, 2018 to September 4, 2018; the middle from September 5, 2018 to August 25, 2019, and the end from August 26, 2019 to May 4, 2020.
 
 
 ```{r, true case count}
@@ -197,7 +201,7 @@ rproj_end <- rproj[as.Date(rproj$date_last_case) >= as.Date("2019-08-26"),]
 
 ## RMSE Calculation
 
-The figure below shows the RMSE values from both the Hawkes and Recursive models during the beginning, middle, and end of the outbreak. The dates for each section are defined in section [5.1](#setup).
+The table below shows the RMSE values from both the Hawkes and Recursive models during the beginning, middle, and end of the outbreak. The dates for each section are defined in section [1](#setup).
 
 
 ```{r}
