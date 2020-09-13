@@ -263,7 +263,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
 forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = true) {
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
-  min_date <- min(ymd(date_vec)) #latest date using lubridate
+  min_date <- min(ymd(date_vec)) #earliest date using lubridate
   date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
   
   if(days == 7) {
