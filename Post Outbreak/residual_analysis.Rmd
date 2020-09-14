@@ -221,6 +221,4 @@ rmse_df <- data.frame(
 rownames(rmse_df) <- c("Beginning","Middle","End")
 rmse_df %>% kable(digits = 2, caption = cap)
 ```
-
-
-
+It is clear that both models are most accurate in the beginning and end of the pandemic as opposed to the middle portion.
