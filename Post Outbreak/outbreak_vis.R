@@ -1,4 +1,4 @@
-# Functions to visualize Hawkes predictions vs. actual Ebola outbreak results
+# Functions to visualize Hawkes and/or predictions vs. actual Ebola outbreak results
 ## Andy Shen, Sarita Lee, Frederic Schoenberg
 ## UCLA Department of Statistics
 
