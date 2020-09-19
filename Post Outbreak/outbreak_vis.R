@@ -11,6 +11,7 @@ add_7 <- function(x) {x + 7} #adding on 7 days
 add_14 <- function(x) {x + 14} #adding on 14 days
 add_21 <- function(x) {x + 21} #adding on 21 days
 add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
+# these are necessary because they are used in lapply() for the list of dates
 
 ######################################################################################################################
 
