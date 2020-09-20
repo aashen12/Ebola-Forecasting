@@ -2,8 +2,6 @@
 ## Andy Shen, Sarita Lee, Frederic Schoenberg
 ## UCLA Department of Statistics
 
-## TEST COMMENT FOR GITHUB
-
 library(tidyverse)
 library(lubridate)
 library(knitr)
