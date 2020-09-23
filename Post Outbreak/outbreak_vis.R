@@ -120,7 +120,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
       data = df,
       aes(x = as.Date(dfdate), y = forecast_total),
       color = col,
-      #linetype = "dashed",
+      linetype = "dashed",
       size = 0.65
     ) + scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
   
