@@ -120,7 +120,7 @@ p + geom_point(
 # Hawkes vs Recursive 14-Day Residual Plot
 
 ```{r}
-cap <- paste0("Residual plot of Hawkes and Recursive 21-day models")
+cap <- paste0("Residual plot of Hawkes and Recursive 14-day models")
 h14 <- single_forecast(hdates, hpreds, days = 14)$results
 r14 <- single_forecast(rdates, rpreds, days = 14)$results
 df <- data.frame(
