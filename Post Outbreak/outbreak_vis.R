@@ -22,10 +22,21 @@ add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 single_forecast <- function(date_vec, forecast_mat, days = 21, 
                             title = NULL, data = true, res = TRUE, point = FALSE) {
   
-  # (SHORT DESCRIPTION OF FUNCTION HERE)
+  # DESCRIPTION
+  # Function that accepts a vector of dates (date_vec) and
+  # their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
+  # as well as the number of forecasted days you want to visualize (days).
+  # Each column of forecast_mat must contain the c(7-day projection, 14-day projection, 21-day projection)
+  # The data argument accepts a data frame with the dataset representing the true case count (solid black line in ggplot).
+  # The res argument decides whether to output table of results and RMSE value, along with a plot. Returns just the plot by default.
+  # The point argument decides whether you want your ggplot to have points at each date or just a smooth line.
+  # The title argument is the title for the corresponding plot.
+  # The same inputs as multi_forecast().
+  # But it returns the x-day forecasts for all dates specified, where x is either
+  # the 7, 14 or 21-day forecast.
+  # The function returns a visualization of confirmed cases vs
+  # the Hawkes model projections for that indicated day.
   #
-  #
-  # 
   # Args:
   #   date_vec: a vector of dates for the outbreak datasets
   #   forecast_mat: the matrix of the outbreak datasets' 1-, 2-, and 3-week forecasts 
@@ -43,20 +54,6 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
   #   gfull_ref:
   #   gsimp:
   #
-  # Function that accepts a vector of dates (date_vec) and
-  # their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
-  # as well as the number of forecasted days you want to visualize (days).
-  # Each column of forecast_mat must contain the c(7-day projection, 14-day projection, 21-day projection)
-  # The data argument accepts a data frame with the dataset representing the true case count (solid black line in ggplot).
-  # The res argument decides whether to output table of results and RMSE value, along with a plot. Returns just the plot by default.
-  # The point argument decides whether you want your ggplot to have points at each date or just a smooth line.
-  # The title argument is the title for the corresponding plot.
-  # The same inputs as multi_forecast().
-  # But it returns the x-day forecasts for all dates specified, where x is either
-  # the 7, 14 or 21-day forecast.
-  # The function returns a visualization of confirmed cases vs
-  # the Hawkes model projections for that indicated day.
-  
   # specify constants
   ## days in 1, 2, and 3 weeks
   n_days_week <- 7

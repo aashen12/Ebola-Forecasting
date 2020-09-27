@@ -44,7 +44,6 @@ last_date <- true$date[length(true$date)]
 last_case <- true$total[length(true$total)]
 ```
 
-<<<<<<< HEAD
 ```{r Recursive Forecast Data, include = FALSE}
 # Recursive Projections Dataset
 
@@ -52,11 +51,9 @@ last_case <- true$total[length(true$total)]
 rproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/recursive_post_proj.csv") #forecasted values
 
 # data manipulation
-=======
-```{r, include = FALSE}
+
 ## Recursive Projections Dataset
 rproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/recursive_post_proj2.csv") #forecasted values
->>>>>>> 5c178426c43eb5c890025efe8ddc05f1c7a11770
 rproj <- rproj %>% select(date_last_case, pred.7, pred.14, pred.21) 
 rproj$date_last_case <- mdy(rproj$date_last_case)
 rproj <- na.omit(rproj) # some dates have no projections
@@ -70,7 +67,7 @@ rpreds <- t(rproj %>% select(pred.7,pred.14,pred.21))
 omit_h <- c(8,17,22,33,47:49,51,52,55,56,60,64,69,77) 
 ```
 
-<<<<<<< HEAD
+
 ```{r Hawkes Forecast Data, include = FALSE}
 # Hawkes Projections Dataset
 
@@ -78,11 +75,9 @@ omit_h <- c(8,17,22,33,47:49,51,52,55,56,60,64,69,77)
 hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj.csv") #forecasted values
 
 # data manipulation
-=======
-```{r, include = FALSE}
+
 ## Hawkes Projections Dataset
 hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj2.csv") #forecasted values
->>>>>>> 5c178426c43eb5c890025efe8ddc05f1c7a11770
 hproj <- hproj %>% select(date_last_case, pred.7, pred.14, pred.21) #selecting only the cols with forecasts
 hproj$date_last_case <- mdy(hproj$date_last_case)
 hproj <- hproj[-omit_h,] #omit the rows that aren't also in recursive
