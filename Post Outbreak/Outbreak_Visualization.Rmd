@@ -31,7 +31,7 @@ rproj$date_last_case <- mdy(rproj$date_last_case)
 rproj <- na.omit(rproj) # some dates have no projections
 rdates <- as.character(rproj$date_last_case)
 rpreds <- t(rproj %>% select(pred.7,pred.14,pred.21))
-omit_h <- c(8,17,22,33,47:49,51,52,55,56,60,64,69,77) #omit hrom Hawkes because Recursive has no data for these dates
+omit_h <- c(8,17,22,33,47:49,51,52,55,56,60,64,69,77) #omit from Hawkes because Recursive has no data for these dates
 ```
 
 ```{r}

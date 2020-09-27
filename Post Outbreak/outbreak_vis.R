@@ -2,78 +2,125 @@
 ## Andy Shen, Sarita Lee, Frederic Schoenberg
 ## UCLA Department of Statistics
 
+# load all libraries needed
 library(tidyverse)
 library(lubridate)
 library(knitr)
 library(Metrics)
 
+# functions for the 1-, 2-, and 3- week forecast dates
+# these are necessary because they are used in lapply() for the list of dates
 add_7 <- function(x) {x + 7} #adding on 7 days
 add_14 <- function(x) {x + 14} #adding on 14 days
 add_21 <- function(x) {x + 21} #adding on 21 days
 add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
-# these are necessary because they are used in lapply() for the list of dates
 
 ######################################################################################################################
 
 ### MAIN FUNCTION ###
 
-## Function that accepts a vector of dates (date_vec) and 
-## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
-## as well as the number of forecasted days you want to visualize (days).
-## Each column of forecast_mat must contain the c(7-day projection, 14-day projection, 21-day projection)
-## The data argument accepts a data frame with the dataset representing the true case count (solid black line in ggplot).
-## The res argument decides whether to output table of results and RMSE value, along with a plot. Returns just the plot by default.
-## The point argument decides whether you want your ggplot to have points at each date or just a smooth line.
-## The title argument is the title for the corresponding plot.
-## The same inputs as multi_forecast().
-## But it returns the x-day forecasts for all dates specified, where x is either
-## the 7, 14 or 21-day forecast.
-## The function returns a visualization of confirmed cases vs
-## the Hawkes model projections for that indicated day.
-
-single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, data = true, res = TRUE, point = FALSE) {
-  size <- 3.0 #point size
+single_forecast <- function(date_vec, forecast_mat, days = 21, 
+                            title = NULL, data = true, res = TRUE, point = FALSE) {
+  
+  # (SHORT DESCRIPTION OF FUNCTION HERE)
+  #
+  #
+  # 
+  # Args:
+  #   date_vec: a vector of dates for the outbreak datasets
+  #   forecast_mat: the matrix of the outbreak datasets' 1-, 2-, and 3-week forecasts 
+  #                 (matrix must be in that order)
+  #   days: number of forecasted days to visualize (valid inputs are 7, 14, or 21)
+  #   title: title of the returned plot
+  #   data: a dataframe of the actual case count
+  #         (NOTE TO ANDY: can we change this to "actual" instead of "true"?)
+  #   res: if TRUE (default), function returns just the plot. If FALSE, function returns
+  #        the table of results and calculated RMSE in addition to the plot
+  #   point: if FALSE (default), makes the ggplot have points at each date rather than the
+  #          a smooth line
+  #
+  # Returns:
+  #   gfull_ref:
+  #   gsimp:
+  #
+  # Function that accepts a vector of dates (date_vec) and
+  # their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
+  # as well as the number of forecasted days you want to visualize (days).
+  # Each column of forecast_mat must contain the c(7-day projection, 14-day projection, 21-day projection)
+  # The data argument accepts a data frame with the dataset representing the true case count (solid black line in ggplot).
+  # The res argument decides whether to output table of results and RMSE value, along with a plot. Returns just the plot by default.
+  # The point argument decides whether you want your ggplot to have points at each date or just a smooth line.
+  # The title argument is the title for the corresponding plot.
+  # The same inputs as multi_forecast().
+  # But it returns the x-day forecasts for all dates specified, where x is either
+  # the 7, 14 or 21-day forecast.
+  # The function returns a visualization of confirmed cases vs
+  # the Hawkes model projections for that indicated day.
+  
+  # specify constants
+  ## days in 1, 2, and 3 weeks
+  n_days_week <- 7
+  one_week <- 1*n_days_week
+  two_weeks <- 2*n_days_week
+  three_weeks <- 3*n_days_week
+  ##  
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
   min_date <- min(ymd(date_vec)) #latest date using lubridate
   date_vecl <- as.list(as.Date(date_vec)) #put dates in list to preserve date structure
-  
-  if(days == 7) {
+
+  # specify information for plotting later
+  size <- 3.0 #point size
+  #colors_all <- c()
+
+  # depending on how many days entered to forecats, 
+  # extract the correct forecast
+  # assign the corresponding dates
+  # specify their line color
+  if(days == one_week) {
     forecast_vec <- forecast_mat[1,] # 7 day projections are row 1
     forc_dates <- lapply(date_vecl, add_7) # add 7 days to each date
     col <- "dodgerblue1"
-  } else if(days == 14) {
+  } else if(days == two_weeks) {
     forecast_vec <- forecast_mat[2,] # 14 day projections are row 2
     forc_dates <- lapply(date_vecl, add_14) # add 14 days to each date
     col <- "red2"
-  } else {
+  } else if(days == three_weeks) {
     forecast_vec <- forecast_mat[3,] # 21 day projections are row 3
     forc_dates <- lapply(date_vecl, add_21) # add 21 days to each date
     col <- "forestgreen"
-  }
+  } else {stop("Invalid number of days specified. 
+               Check that the number of days is either 7, 14, or 21.")}
   
+  # (comment here)
   l2 <- length(forc_dates)
   date_list <- rep(NA, l2)
-  for(i in 1:l2) {
-    date_list[i] <- as.list(forc_dates[[i]])
-    #group all dates into their own list
-  } 
+  #group all dates into their own list
+  for(i in 1:l2) { date_list[i] <- as.list(forc_dates[[i]]) } 
   dfdate <- t(data.frame(date_list)) #data.frame to preserve date structure
   
+  # (comment here)
   total_vec <- rep(NA, l)
-  for(i in seq_len(l)) {
-    total_vec[i] <- data$total[data$date == as.Date(date_vec[i])]
-  } #generating cumulative case counts for each desired day
+  #generating cumulative case counts for each desired day
+  for(i in seq_len(l)) { total_vec[i] <- data$total[data$date == as.Date(date_vec[i])] } 
   
-  forecast_total <- forecast_vec + total_vec # adding forecasted values to cumulative totals
+  # adding forecasted values to cumulative totals
+  forecast_total <- forecast_vec + total_vec 
   # this recycles, so order is very important here!
   df <- data.frame(dfdate, forecast_total) # data frame for ggplot
   
-  #complete ggplot with all points, WITH VERTICAL LINE AT DATES, THIS GRAPH CONTAINS EVERYTHING
+  
+  # NOTE TO ANDY:  what if we split this whole function?
+  # one function that does all the data manipulation and returns a dataset
+  # another function that does all the plotting (using created dataset)
+  # another function that does RMSE calcuation
+  
+  
+  #complete ggplot with all points
+  # WITH VERTICAL LINE AT DATES, THIS GRAPH CONTAINS EVERYTHING
   gfull <- ggplot(
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),], #range is 28 days ahead and 14 days behind
-    mapping = aes(x = date, y = total)
-  ) + 
+    mapping = aes(x = date, y = total)) + 
     geom_line() + 
     theme_light() + 
     geom_vline(xintercept = as.Date(date_vec), col = "gray75") +  #line at each date forecasted
@@ -97,7 +144,8 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
     ) + scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
   
   
-  #Plot with no vertical lines at dates, CONTAINS POINTS AT EACH FORECASTED DATE INSTEAD OF JUST A DASHED LINE
+  #Plot with no vertical lines at dates
+  # CONTAINS POINTS AT EACH FORECASTED DATE INSTEAD OF JUST A DASHED LINE
   gfull_ref <- ggplot( 
     data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
     mapping = aes(x = date, y = total)
@@ -142,7 +190,8 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
     ) + scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
   
   
-  if(res == TRUE) { # CREATES ADDITIONAL OUTPUT BY CALCULATING RMSE AND GIVES DATA FRAME OF RESULTS
+  # CREATES ADDITIONAL OUTPUT BY CALCULATING RMSE AND GIVES DATA FRAME OF RESULTS
+  if(res == TRUE) { 
     if(days == 7) {
       fdate <- as.Date(date_vec) + 7 #add 7 for 7-day forecast
       actual <- rep(NA,length(fdate))
@@ -258,10 +307,13 @@ single_forecast <- function(date_vec, forecast_mat, days = 21, title = NULL, dat
 }
 
 ######################################################################################################################
-## Function that takes the same inputs as single_forecast() and 
-## returns only the RMSE value.
+
 
 forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = true) {
+  
+  # Function that takes the same inputs as single_forecast() and
+  # returns only the RMSE value.
+  
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
   min_date <- min(ymd(date_vec)) #earliest date using lubridate
@@ -409,12 +461,14 @@ forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = true) {
 
 ######################################################################################################################
 
-## The full_forecast function plots the result from a single Hawkes or Recursive forecast 
-## with respect to the entire outbreak.
 
-## This function requires the ggplot() object p to be declared
 
 full_forecast <- function(rdate, forecast) {
+  
+  # The full_forecast function plots the result from a single Hawkes or Recursive forecast
+  # with respect to the entire outbreak.
+  # This function requires the ggplot() object p to be declared
+  
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   df <- data.frame(Prediction, forecast)
   
@@ -435,17 +489,19 @@ full_forecast <- function(rdate, forecast) {
 
 ######################################################################################################################
 
-## Function that accepts a vector of dates (date_vec) and 
-## their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat).
-## The title argument is the title for the corresponding plot.
-## The function returns a visualization of confirmed cases vs
-## the model projections.
-## The matrix of forecasted values is organized BY COLUMN. Each column in forecast_mat is a 3x1 vector.
 
-## NOTE: if you are just visualizing a single forecast, you DO NOT 
-## need to cbind() your projections in forecast_mat, just the vector is enough.
 
 multi_forecast <- function(date_vec, forecast_mat, data = true, title = NULL) {
+  
+  # Function that accepts a vector of dates (date_vec) and
+  # their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat).
+  # The title argument is the title for the corresponding plot.
+  # The function returns a visualization of confirmed cases vs
+  # the model projections.
+  # The matrix of forecasted values is organized BY COLUMN. Each column in forecast_mat is a 3x1 vector.
+
+  # NOTE: if you are just visualizing a single forecast, you DO NOT
+  # need to cbind() your projections in forecast_mat, just the vector is enough.
   
   Prediction <- c("7-Day Forecast","14-Day Forecast","21-Day Forecast") #for legend
   
