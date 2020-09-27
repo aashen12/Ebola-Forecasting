@@ -1,0 +1,58 @@
+---
+title: "Ebola Forecasting Analysis"
+author: "Andy Shen"
+date: "8/13/2020"
+output: pdf_document
+---
+
+# RMSE
+
+```{r}
+## Complete Outbreak Dataset 
+## Used to plot the true number of infections over time
+rm(list=ls())
+true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
+source("outbreak_vis.R") #script with functions
+rgx <- "\\d{1,2}\\/\\d{1,2}\\/\\d{4}" #date structure regex
+true <- true[str_detect(true$Date, rgx),] #omits rows without a date
+colnames(true) <- c("date", "cases")
+true$date <- mdy(true$date) #converts into a consistent date format
+true$cases[is.na(true$cases)] <- 0
+true <- true %>% mutate(total = cumsum(cases))
+last_date <- true$date[length(true$date)]
+last_case <- true$total[length(true$total)]
+```
+
+```{r}
+## Recursive Projections Dataset
+rproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/recursive_post_proj.csv") #forecasted values
+rproj <- rproj %>% select(date_last_case, pred.7, pred.14, pred.21) 
+rproj$date_last_case <- mdy(rproj$date_last_case)
+rproj <- na.omit(rproj) # some dates have no projections
+rdates <- as.character(rproj$date_last_case)
+rpreds <- t(rproj %>% select(pred.7,pred.14,pred.21))
+omit_h <- c(8,17,22,33,47:49,51,52,55,56,60,64,69,77) #omit from Hawkes because Recursive has no data for these dates
+```
+
+```{r}
+## Hawkes Projections Dataset
+hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj.csv") #forecasted values
+hproj <- hproj %>% select(date_last_case, pred.7, pred.14, pred.21) #selecting only the cols with forecasts
+hproj$date_last_case <- mdy(hproj$date_last_case)
+hproj <- hproj[-omit_h,] #omit the rows that aren't also in recursive
+hdates <- as.character(hproj$date_last_case) #for working with dates
+hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21)) #take t() for the function
+rownames(hproj) <- 1:nrow(hproj)
+```
+
+```{r}
+ind <- 1:2
+single_forecast(hdates, hpreds, days = 7,  title = NULL, res = F, point = T)
+multi_forecast(hdates[ind], hpreds[,ind])
+```
+
+
+```{r}
+forecast_rmse(hdates, hpreds, days = 7)
+```
+
