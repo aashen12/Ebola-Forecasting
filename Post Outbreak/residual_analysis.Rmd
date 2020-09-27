@@ -13,23 +13,23 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r, include = FALSE}
 ## Complete Outbreak Dataset 
-## Used to plot the true number of infections over time
+## Used to plot the actual number of infections over time
 rm(list=ls())
-true <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
+actual <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
 source("outbreak_vis.R") #script with functions
 rgx <- "\\d{1,2}\\/\\d{1,2}\\/\\d{4}" #date structure regex
-true <- true[str_detect(true$Date, rgx),] #omits rows without a date
-colnames(true) <- c("date", "cases")
-true$date <- mdy(true$date) #converts into a consistent date format
-true$cases[is.na(true$cases)] <- 0
-true <- true %>% mutate(total = cumsum(cases))
-last_date <- true$date[length(true$date)]
-last_case <- true$total[length(true$total)]
+actual <- actual[str_detect(actual$Date, rgx),] #omits rows without a date
+colnames(actual) <- c("date", "cases")
+actual$date <- mdy(actual$date) #converts into a consistent date format
+actual$cases[is.na(actual$cases)] <- 0
+actual <- actual %>% mutate(total = cumsum(cases))
+last_date <- actual$date[length(actual$date)]
+last_case <- actual$total[length(actual$total)]
 ```
 
 ```{r, include = FALSE}
 ## Recursive Projections Dataset
-rproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/recursive_post_proj2.csv") #forecasted values
+rproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/recursive_post_proj.csv") #forecasted values
 rproj <- rproj %>% select(date_last_case, pred.7, pred.14, pred.21) 
 rproj$date_last_case <- mdy(rproj$date_last_case)
 rproj <- na.omit(rproj) # some dates have no projections
@@ -42,7 +42,7 @@ omit_h <- c(8,17,22,33,47:49,51,52,55,56,60,64,69,77) #omit from Hawkes because 
 
 ```{r, include = FALSE}
 ## Hawkes Projections Dataset
-hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj2.csv") #forecasted values
+hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj.csv") #forecasted values
 hproj <- hproj %>% select(date_last_case, pred.7, pred.14, pred.21) #selecting only the cols with forecasts
 hproj$date_last_case <- mdy(hproj$date_last_case)
 hproj <- hproj[-omit_h,] #omit the rows that aren't also in recursive
@@ -63,14 +63,14 @@ We define the beginning, middle, and end of the outbreak such that the beginning
 The figure below shows the number of new Ebola cases in West Africa by day during the outbreak. The grey lines represent boundaries between the beginning, middle and end of the outbreak (see section [1](#setup)).
 
 ```{r,warning=FALSE}
-true <- true %>% mutate(seven_day_avg = zoo::rollmean(cases, k = 7,fill = NA))
+actual <- actual %>% mutate(seven_day_avg = zoo::rollmean(cases, k = 7,fill = NA))
 title <- paste0("Ebola Cases by Day in West Africa with 7-day Rolling Average")
 ggplot(
-  data = true,
+  data = actual,
   mapping = aes(x = date, y = cases)
 ) + geom_col(color = "lightblue") + theme_classic() + 
   geom_path(
-    data = true, 
+    data = actual, 
     mapping = aes(x = date, y = seven_day_avg),
     color = "black",
     size = 0.75
@@ -96,7 +96,7 @@ df <- data.frame(
 )
 df <- pivot_longer(df, cols = 2:3, names_to = "forecast", values_to = "resid")
 p <- ggplot(
-  data = true,
+  data = actual,
   mapping = aes(x = date, y = total)
 ) + 
   theme_classic() + 
@@ -130,7 +130,7 @@ df <- data.frame(
 )
 df <- pivot_longer(df, cols = 2:3, names_to = "forecast", values_to = "resid")
 p <- ggplot(
-  data = true,
+  data = actual,
   mapping = aes(x = date, y = total)
 ) + 
   theme_classic() + 
@@ -161,7 +161,7 @@ df <- data.frame(
 )
 df <- pivot_longer(df, cols = 2:3, names_to = "forecast", values_to = "resid")
 p <- ggplot(
-  data = true,
+  data = actual,
   mapping = aes(x = date, y = total)
 ) + 
   theme_classic() + 
@@ -242,11 +242,12 @@ p + labs(caption = cap) +
 # RMSE Calculation During Outbreak
 
 
-```{r, true case count}
-beg <- true[as.Date(true$date) <= as.Date("2018-09-04"),]
-mid <- true[(as.Date(true$date) > as.Date("2018-09-04")) & (as.Date(true$date) <= as.Date("2019-08-25")),]
-end <- true[as.Date(true$date) >= as.Date("2019-08-26"),]
+```{r, actual case count}
+beg <- actual[as.Date(actual$date) <= as.Date("2018-09-04"),]
+mid <- actual[(as.Date(actual$date) > as.Date("2018-09-04")) & (as.Date(actual$date) <= as.Date("2019-08-25")),]
+end <- actual[as.Date(actual$date) >= as.Date("2019-08-26"),]
 ```
+
 ```{r, Hawkes}
 hproj_beg <- hproj[as.Date(hproj$date_last_case) <= as.Date("2018-09-04"),]
 hproj_mid <- hproj[(as.Date(hproj$date_last_case) > as.Date("2018-09-04")) & (as.Date(hproj$date_last_case) <= as.Date("2019-08-25")),]

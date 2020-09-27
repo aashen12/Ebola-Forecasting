@@ -20,22 +20,11 @@ add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 ### MAIN FUNCTION ###
 
 single_forecast <- function(date_vec, forecast_mat, days = 21, 
-                            title = NULL, data = true, res = TRUE, point = FALSE) {
+                            title = NULL, data = actual, res = TRUE, point = FALSE) {
   
   # DESCRIPTION
-  # Function that accepts a vector of dates (date_vec) and
-  # their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
-  # as well as the number of forecasted days you want to visualize (days).
-  # Each column of forecast_mat must contain the c(7-day projection, 14-day projection, 21-day projection)
-  # The data argument accepts a data frame with the dataset representing the true case count (solid black line in ggplot).
-  # The res argument decides whether to output table of results and RMSE value, along with a plot. Returns just the plot by default.
-  # The point argument decides whether you want your ggplot to have points at each date or just a smooth line.
-  # The title argument is the title for the corresponding plot.
-  # The same inputs as multi_forecast().
-  # But it returns the x-day forecasts for all dates specified, where x is either
-  # the 7, 14 or 21-day forecast.
-  # The function returns a visualization of confirmed cases vs
-  # the Hawkes model projections for that indicated day.
+  # Function that returns plot of actual Ebola cases vs. their 7, 14 or 21-day forecasts,
+  # along with corresponding RMSE values and dataset used to produce the plots.
   #
   # Args:
   #   date_vec: a vector of dates for the outbreak datasets
@@ -51,16 +40,37 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
   #          a smooth line
   #
   # Returns:
-  #   gfull_ref:
-  #   gsimp:
+  #   plot:
+  #     gfull_ref: Complete plot with points denoting the forecast for each date that was forecasted.
+  #     gsimp: Complete plot without vertical lines and points, instead returns a colored dashed line showing the overall forecast trend
+  #   rmse: RMSE of data
+  #   results: data frame with actual and forecasted values for each date (this data frame is used to create the plots)
   #
+  # Function that accepts a vector of dates (date_vec) and
+  # their corresponding 7, 14 and 21 day forecasted values, respectively (forecast_mat),
+  # as well as the number of forecasted days you want to visualize (days).
+  # Each column of forecast_mat must contain the c(7-day projection, 14-day projection, 21-day projection)
+  # The data argument accepts a data frame with the dataset representing the true case count (solid black line in ggplot).
+  # The res argument decides whether to output table of results and RMSE value, along with a plot. Returns just the plot by default.
+  # The point argument decides whether you want your ggplot to have points at each date or just a smooth line.
+  # The title argument is the title for the corresponding plot.
+  # The same inputs as multi_forecast().
+  # But it returns the x-day forecasts for all dates specified, where x is either
+  # the 7, 14 or 21-day forecast.
+  # The function returns a visualization of confirmed cases vs
+  # the Hawkes model projections for that indicated day.
+  
+######################################################################################################################
+  
+  ### DATA CLEANING AND MANIPULATION ###
+  
   # specify constants
   ## days in 1, 2, and 3 weeks
   n_days_week <- 7
   one_week <- 1*n_days_week
   two_weeks <- 2*n_days_week
   three_weeks <- 3*n_days_week
-  ##  
+  
   l <- length(date_vec)
   max_date <- max(ymd(date_vec)) #latest date using lubridate
   min_date <- min(ymd(date_vec)) #latest date using lubridate
@@ -68,9 +78,8 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
 
   # specify information for plotting later
   size <- 3.0 #point size
-  #colors_all <- c()
 
-  # depending on how many days entered to forecats, 
+  # depending on how many days entered to forecast, 
   # extract the correct forecast
   # assign the corresponding dates
   # specify their line color
@@ -89,14 +98,14 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
   } else {stop("Invalid number of days specified. 
                Check that the number of days is either 7, 14, or 21.")}
   
-  # (comment here)
-  l2 <- length(forc_dates)
-  date_list <- rep(NA, l2)
-  #group all dates into their own list
+  # Grouping all dates from a list into a vector while preserving date structure
+  l2 <- length(forc_dates) #number of dates used in the analysis
+  date_list <- rep(NA, l2) #group all dates into their own list
   for(i in 1:l2) { date_list[i] <- as.list(forc_dates[[i]]) } 
   dfdate <- t(data.frame(date_list)) #data.frame to preserve date structure
   
-  # (comment here)
+  # For each date in date_vec (list of dates initially accepted by the function),
+  # extract the cumulative total at that date
   total_vec <- rep(NA, l)
   #generating cumulative case counts for each desired day
   for(i in seq_len(l)) { total_vec[i] <- data$total[data$date == as.Date(date_vec[i])] } 
@@ -106,17 +115,18 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
   # this recycles, so order is very important here!
   df <- data.frame(dfdate, forecast_total) # data frame for ggplot
   
+
+  ######################################################################################################################
   
-  # NOTE TO ANDY:  what if we split this whole function?
-  # one function that does all the data manipulation and returns a dataset
-  # another function that does all the plotting (using created dataset)
-  # another function that does RMSE calcuation
+  ### DATA VISUALIZATION ###
   
+  back <- 14 # how many days back to plot
+  ahead <- 28 #how many days ahead to plot
   
   #complete ggplot with all points
   # WITH VERTICAL LINE AT DATES, THIS GRAPH CONTAINS EVERYTHING
   gfull <- ggplot(
-    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),], #range is 28 days ahead and 14 days behind
+    data = data[(data$date < as.Date(max_date) + ahead) & (data$date > as.Date(min_date) - back),], #range is 28 days ahead and 14 days behind
     mapping = aes(x = date, y = total)) + 
     geom_line() + 
     theme_light() + 
@@ -144,7 +154,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
   #Plot with no vertical lines at dates
   # CONTAINS POINTS AT EACH FORECASTED DATE INSTEAD OF JUST A DASHED LINE
   gfull_ref <- ggplot( 
-    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
+    data = data[(data$date < as.Date(max_date) + ahead) & (data$date > as.Date(min_date) - back),],
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + 
@@ -171,7 +181,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
   
   #Graph with NO point markers, and trend line is dashed
   gsimp <- ggplot(
-    data = data[(data$date < as.Date(max_date) + 28) & (data$date > as.Date(min_date) - 14),],
+    data = data[(data$date < as.Date(max_date) + ahead) & (data$date > as.Date(min_date) - back),],
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + #line for true forecasts
@@ -186,17 +196,20 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
       size = size - 2.2
     ) + scale_x_date(date_breaks = "5 months", date_labels = "%b-%y")
   
+######################################################################################################################
+  
+  ### RMSE CALCULATION ###
   
   # CREATES ADDITIONAL OUTPUT BY CALCULATING RMSE AND GIVES DATA FRAME OF RESULTS
-  if(res == TRUE) { 
+  if(res == TRUE) { # This argument generates RMSEs and data frame of results
     if(days == 7) {
       fdate <- as.Date(date_vec) + 7 #add 7 for 7-day forecast
-      actual <- rep(NA,length(fdate))
+      actual_cases <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
         if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
-          actual[i] <- NA # accounting for blank arguments
+          actual_cases[i] <- NA # accounting for blank arguments
         } else{
-          actual[i] <- data$total[data$date == as.Date(fdate[i])]
+          actual_cases[i] <- data$total[data$date == as.Date(fdate[i])]
         }
       } #record the actual number of cases for the given increment (days)
       
@@ -205,31 +218,33 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
           date_vec,
           total_vec,
           dfdate,
-          actual,
+          actual_cases,
           total_vec + forecast_mat[1,]
         )
       )
       row.names(df_show) <- 1:nrow(df_show)
       colnames(df_show) <- c("prior.date","prior.total","forecast.date","actual.total","forecast.total")
+      
       df_show$prior.total <- as.numeric(df_show$prior.total)
       df_show$actual.total <- as.numeric(df_show$actual.total)
       df_show$forecast.total <- as.numeric(df_show$forecast.total)
+      
       df_show <- df_show %>% mutate(
         resids = actual.total - forecast.total
-      ) 
+      ) # calculate residuals
       RMSE <- df_show %>% summarise(
         RMSE = sqrt( mean(na.omit(resids)^2) )
-      )
-      RMSE <- RMSE[1,1]
+      ) # calculate RMSE
+      RMSE <- RMSE[1,1] #extract the RMSE value due to setup of dplyr
     } 
     else if(days == 14) {
       fdate <- as.Date(date_vec) + 14
-      actual <- rep(NA,length(fdate))
+      actual_cases <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
         if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
-          actual[i] <- NA # accounting for blank arguments
+          actual_cases[i] <- NA # accounting for blank arguments
         } else{
-          actual[i] <- data$total[data$date == as.Date(fdate[i])]
+          actual_cases[i] <- data$total[data$date == as.Date(fdate[i])]
         }
       } #record the actual number of cases for the given increment (days)
       
@@ -238,7 +253,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
           date_vec,
           total_vec,
           dfdate,
-          actual,
+          actual_cases,
           total_vec + forecast_mat[2,]
         )
       )
@@ -257,12 +272,12 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
     }
     else {
       fdate <- as.Date(date_vec) + 21
-      actual <- rep(NA,length(fdate))
+      actual_cases <- rep(NA,length(fdate))
       for(i in 1:length(fdate)) {
         if(length(data$total[data$date == as.Date(fdate[i])]) == 0) {
-          actual[i] <- NA # accounting for blank arguments
+          actual_cases[i] <- NA # accounting for blank arguments
         } else{
-          actual[i] <- data$total[data$date == as.Date(fdate[i])]
+          actual_cases[i] <- data$total[data$date == as.Date(fdate[i])]
         }
       }#record the actual number of cases for the given increment (days)
       
@@ -271,7 +286,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
           date_vec,
           total_vec,
           dfdate,
-          actual,
+          actual_cases,
           total_vec + forecast_mat[3,]
         )
       )
@@ -306,7 +321,7 @@ single_forecast <- function(date_vec, forecast_mat, days = 21,
 ######################################################################################################################
 
 
-forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = true) {
+forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = actual) {
   
   # Function that takes the same inputs as single_forecast() and
   # returns only the RMSE value.
@@ -368,21 +383,25 @@ forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = true) {
     )
     row.names(df_show) <- 1:nrow(df_show)
     colnames(df_show) <- c("prior.date","prior.total","forecast.date","actual.total","forecast.total")
+    
     df_show$prior.total <- as.numeric(df_show$prior.total)
     df_show$actual.total <- as.numeric(df_show$actual.total)
     df_show$forecast.total <- as.numeric(df_show$forecast.total)
+    
     df_show <- df_show %>% mutate(
       resids = actual.total - forecast.total
-    ) 
+    ) #creating residuals 
+    
     RMSE <- df_show %>% summarise(
       RMSE = sqrt( mean(na.omit(resids)^2) )
-    )
-    RMSE <- RMSE[1,1]
-    RMSE2<-Metrics::rmse(df_show$actual.total,df_show$forecast.total) #built-in
-    if(RMSE == RMSE2) {
+    ) #calculating RMSE
+    
+    RMSE <- RMSE[1,1] #extracts the singular value due to dplyr formatting
+    RMSE2 <- Metrics::rmse(df_show$actual.total,df_show$forecast.total) #built-in
+    if(RMSE == RMSE2) { #double-checking that built-in is the same
       return(RMSE)
     } else{
-      return(cat("RMSE does not match"))
+      stop(cat("RMSE does not match"))
     }
   } 
   else if(days == 14) {
@@ -417,7 +436,7 @@ forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = true) {
       RMSE = sqrt( mean(na.omit(resids)^2) )
     )
     RMSE <- RMSE[1,1]
-    return(RMSE)
+    return(RMSE) #we don't need the RMSE2 argument check because the built-in can't handle NAs
   }
   else {
     fdate <- as.Date(date_vec) + 21
