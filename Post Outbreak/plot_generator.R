@@ -41,7 +41,7 @@ hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21)) #take t() for the function
 
 fig <- 1 # for numbering the figures in the plots
 # create the plot
-title <- paste0("Figure ",fig,": Hawkes 7-Day Forecasts for All Datasets")
+title <- paste0("Hawkes 7-Day Forecasts for All Datasets")
 mod <- single_forecast(hdates, hpreds, days = 7,  title = title, res = TRUE)
 mod$plot
 ggsave(
@@ -53,7 +53,7 @@ ggsave(
 # update numbering the figures
 fig <- fig + 1
 # create and display the plot
-title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for All Datasets")
+title <- paste0("Hawkes 14-Day Forecasts for All Datasets")
 mod <- single_forecast(hdates, hpreds, days = 14, title = title, res = TRUE)
 mod$plot
 ggsave(
@@ -66,7 +66,7 @@ ggsave(
 # update numbering the figures
 fig <- fig + 1
 # create and display the plot
-title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for All Datasets")
+title <- paste0("Hawkes 21-Day Forecasts for All Datasets")
 mod <- single_forecast(hdates, hpreds, days = 21,  title = title, res = TRUE)
 mod$plot
 ggsave(
@@ -78,7 +78,7 @@ ggsave(
 # update numbering the figures
 fig <- fig + 1
 # create and display the plot 
-title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Datasets")
+title <- paste0("Recursive 7-Day Forecasts for All Datasets")
 mod <- single_forecast(rdates, rpreds, days = 7, title = title, res = TRUE)
 mod$plot
 ggsave(
@@ -91,7 +91,7 @@ ggsave(
 # update numbering the figures
 fig <- fig + 1
 # create and display the plot
-title <- paste0("Figure ",fig,": Recursive 14-Day Forecasts for All Datasets")
+title <- paste0("Recursive 14-Day Forecasts for All Datasets")
 mod <- single_forecast(rdates, rpreds, days = 14, title = title, res = TRUE)
 mod$plot
 ggsave(
@@ -104,7 +104,7 @@ ggsave(
 # update numbering the figures
 fig <- fig + 1
 # create and display the plot
-title <- paste0("Figure ",fig,": Recursive 21-Day Forecasts for All Datasets")
+title <- paste0("Recursive 21-Day Forecasts for All Datasets")
 mod <- single_forecast(rdates, rpreds, days = 21, title = title, res = TRUE)
 mod$plot
 ggsave(
