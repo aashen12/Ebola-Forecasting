@@ -29,7 +29,7 @@ rgx <- "\\d{1,2}\\/\\d{1,2}\\/\\d{4}" #date structure regex
 # Complete Outbreak Dataset
 # Used to plot the actual number of infections over time
 
-# read in data
+# read in data that is the actual case counts
 actual <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
 
 # data manipulation

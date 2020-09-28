@@ -1,5 +1,5 @@
 ---
-title: "Ebola Forecasting Analysis"
+title: "2018 DRC Ebola Outbreak - Forecasting Analysis"
 author: "Andy Shen"
 date: "8/13/2020"
 output: pdf_document
