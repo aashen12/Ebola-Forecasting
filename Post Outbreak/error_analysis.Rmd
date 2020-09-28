@@ -21,7 +21,7 @@ Some dates in the Hawkes forecast models do not have a corresponding Recursive m
 
 ```{r, include = FALSE}
 rm(list=ls())
-source("outbreak_vis.R") #script with functions
+source("/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/outbreak_vis.R") #script with functions
 rgx <- "\\d{1,2}\\/\\d{1,2}\\/\\d{4}" #date structure regex
 ```
 

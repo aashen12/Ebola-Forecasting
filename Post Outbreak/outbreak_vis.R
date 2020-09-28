@@ -121,7 +121,6 @@ single_forecast <- function(date_vec, forecast_mat, data = actual, days = 21, ti
   
   #complete ggplot with all points
   #with vertical lines at dates (this graph contains everything)
-  #browser()
   gfull <- ggplot(
     data = data[(data$date < (as.Date(max_date) + ahead)) & (data$date > (as.Date(min_date) - back)),], #range is 28 days ahead and 14 days behind
     mapping = aes(x = date, y = total)
@@ -140,9 +139,9 @@ single_forecast <- function(date_vec, forecast_mat, data = actual, days = 21, ti
               #linetype = "dashed",
               size = size_point - 2.2) + 
     labs(caption = title) +
-    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5)) + 
     scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") +
-    theme_light()
+    theme_light() +
+    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5, face = "italic"))
   
   #Plot with no vertical lines at dates
   # contains points at each forecasted date instead of dashed line
@@ -162,9 +161,9 @@ single_forecast <- function(date_vec, forecast_mat, data = actual, days = 21, ti
               linetype = "dashed",
               size = 0.65) + 
     labs(caption = title) +
-    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5)) + 
     scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") +
-    theme_light() 
+    theme_light() + 
+    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5, face = "italic"))
     
   #Plot with no point markers, and trend line is dashed
   gsimp <- ggplot(
@@ -172,16 +171,17 @@ single_forecast <- function(date_vec, forecast_mat, data = actual, days = 21, ti
     mapping = aes(x = date, y = total)
   ) + 
     geom_line() + #line for true forecasts
-    geom_path(data = df,
-              aes(x = as.Date(dfdate), y = forecast_total),
-              color = col,
-              linetype = "dashed",
-              size = size_point - 2.2) + 
+    geom_path(
+      data = df,
+      aes(x = as.Date(dfdate), y = forecast_total),
+      color = col,
+      linetype = "dashed",
+      size = size_point - 2.2
+    ) + 
     labs(caption = title) +
-    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5)) + 
     scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") +
-    theme_light()
-  
+    theme_light() +
+    theme(legend.position = "bottom", plot.caption = element_text(hjust = 0.5, face = "italic"))
 
   ### RMSE CALCULATION ###
   

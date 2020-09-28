@@ -1,22 +1,8 @@
----
-title: "Ebola Forecasting - Residual Analysis"
-author: "Andy Shen"
-date: "9/11/2020"
-output: 
-  pdf_document:
-    number_sections: true
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
-
-```{r, include = FALSE}
 ## Complete Outbreak Dataset 
 ## Used to plot the actual number of infections over time
 rm(list=ls())
+source("/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/outbreak_vis.R") #script with functions
 actual <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/15UGkfREtfqH3LdfHmCsSpFJ5SrTnSeyt/ebola/2020-05-04_ebola/2020-05-04_data.csv")
-source("outbreak_vis.R") #script with functions
 rgx <- "\\d{1,2}\\/\\d{1,2}\\/\\d{4}" #date structure regex
 actual <- actual[str_detect(actual$Date, rgx),] #omits rows without a date
 colnames(actual) <- c("date", "cases")
@@ -25,44 +11,112 @@ actual$cases[is.na(actual$cases)] <- 0
 actual <- actual %>% mutate(total = cumsum(cases))
 last_date <- actual$date[length(actual$date)]
 last_case <- actual$total[length(actual$total)]
-```
 
-```{r, include = FALSE}
-## Recursive Projections Dataset
+# Recursive Projections Dataset
+# read in data
 rproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/recursive_post_proj.csv") #forecasted values
+# data manipulation
 rproj <- rproj %>% select(date_last_case, pred.7, pred.14, pred.21) 
 rproj$date_last_case <- mdy(rproj$date_last_case)
 rproj <- na.omit(rproj) # some dates have no projections
-#rproj <- rproj %>% distinct()
+# rproj <- rproj %>% distinct()
 rownames(rproj) <- 1:nrow(rproj)
 rdates <- as.character(rproj$date_last_case)
 rpreds <- t(rproj %>% select(pred.7,pred.14,pred.21))
-omit_h <- c(8,17,22,33,47:49,51,52,55,56,60,64,69,77) #omit from Hawkes because Recursive has no data for these dates
-```
+# note the dates of the datasets are missing forecasts
+# these are the ones to omit from Hawkes
+omit_h <- c(8,17,22,33,47:49,51,52,55,56,60,64,69,77) 
 
-```{r, include = FALSE}
-## Hawkes Projections Dataset
+
+# Hawkes Projections Dataset
+# read in data 
 hproj <- read.csv("/Volumes/GoogleDrive/.shortcut-targets-by-id/1LaD1nL_OAOposW2fr2XDcs6BLHVBC-jA/2019 Ebola/Post-Outbreak Analysis/hawkes_post_proj.csv") #forecasted values
 hproj <- hproj %>% select(date_last_case, pred.7, pred.14, pred.21) #selecting only the cols with forecasts
 hproj$date_last_case <- mdy(hproj$date_last_case)
 hproj <- hproj[-omit_h,] #omit the rows that aren't also in recursive
-#hproj <- hproj %>% distinct()
+# hproj <- hproj %>% distinct()
+rownames(hproj) <- 1:nrow(hproj)
 hdates <- as.character(hproj$date_last_case) #for working with dates
 hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21)) #take t() for the function
-rownames(hproj) <- 1:nrow(hproj)
-```
+
+fig <- 1 # for numbering the figures in the plots
+# create the plot
+title <- paste0("Figure ",fig,": Hawkes 7-Day Forecasts for All Datasets")
+mod <- single_forecast(hdates, hpreds, days = 7,  title = title, res = TRUE)
+mod$plot
+ggsave(
+  "hawkes7_all.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
+
+# update numbering the figures
+fig <- fig + 1
+# create and display the plot
+title <- paste0("Figure ",fig,": Hawkes 14-Day Forecasts for All Datasets")
+mod <- single_forecast(hdates, hpreds, days = 14, title = title, res = TRUE)
+mod$plot
+ggsave(
+  "hawkes14_all.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
 
 
+# update numbering the figures
+fig <- fig + 1
+# create and display the plot
+title <- paste0("Figure ",fig,": Hawkes 21-Day Forecasts for All Datasets")
+mod <- single_forecast(hdates, hpreds, days = 21,  title = title, res = TRUE)
+mod$plot
+ggsave(
+  "hawkes21_all.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
 
-# Setup {#setup}
+# update numbering the figures
+fig <- fig + 1
+# create and display the plot 
+title <- paste0("Figure ",fig,": Recursive 7-Day Forecasts for All Datasets")
+mod <- single_forecast(rdates, rpreds, days = 7, title = title, res = TRUE)
+mod$plot
+ggsave(
+  "rec7_all.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
 
-We define the beginning, middle, and end of the outbreak such that the beginning is from May 3, 2018 to September 4, 2018, the middle from September 5, 2018 to August 25, 2019, and the end from August 26, 2019 to May 4, 2020.
+
+# update numbering the figures
+fig <- fig + 1
+# create and display the plot
+title <- paste0("Figure ",fig,": Recursive 14-Day Forecasts for All Datasets")
+mod <- single_forecast(rdates, rpreds, days = 14, title = title, res = TRUE)
+mod$plot
+ggsave(
+  "rec14_all.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
+
+
+# update numbering the figures
+fig <- fig + 1
+# create and display the plot
+title <- paste0("Figure ",fig,": Recursive 21-Day Forecasts for All Datasets")
+mod <- single_forecast(rdates, rpreds, days = 21, title = title, res = TRUE)
+mod$plot
+ggsave(
+  "rec21_all.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
+
 
 # New Ebola Cases by Day
-
-The figure below shows the number of new Ebola cases in West Africa by day during the outbreak. The grey lines represent boundaries between the beginning, middle and end of the outbreak (see section [1](#setup)).
-
-```{r,warning=FALSE}
+# update numbering the figures
+fig <- fig + 1
 actual <- actual %>% mutate(seven_day_avg = zoo::rollmean(cases, k = 7,fill = NA))
 title <- paste0("Ebola Cases by Day in West Africa with 7-day Rolling Average")
 ggplot(
@@ -79,13 +133,15 @@ ggplot(
   scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") + 
   geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
   geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
-```
+ggsave(
+  "daily_new_cases.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
 
-\pagebreak
 
 # Hawkes vs Recursive 7-Day Residual Plot
-
-```{r,warning=FALSE}
+fig <- fig + 1
 cap <- paste0("Residual plot of Hawkes and Recursive 7-day models")
 h7 <- (single_forecast(hdates, hpreds, days = 7)$results)
 r7 <- (single_forecast(rdates, rpreds, days = 7)$results)
@@ -103,23 +159,22 @@ p <- ggplot(
   theme(plot.caption = element_text(hjust = 0.5), legend.position = "bottom") +
   scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") + 
   geom_hline(aes(yintercept=0))
-  
+
 p + geom_point(
   data = df,
   mapping = aes(x = as.Date(date), y = resid, color = forecast)
 ) + labs(caption = cap) + 
   geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
   geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
-```
-
-\pagebreak
-
-
+ggsave(
+  "hawkes_vs_rec_7.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
 
 
 # Hawkes vs Recursive 14-Day Residual Plot
-
-```{r,warning=FALSE}
+fig <- fig + 1
 cap <- paste0("Residual plot of Hawkes and Recursive 14-day models")
 h14 <- single_forecast(hdates, hpreds, days = 14)$results
 r14 <- single_forecast(rdates, rpreds, days = 14)$results
@@ -137,20 +192,22 @@ p <- ggplot(
   theme(plot.caption = element_text(hjust = 0.5), legend.position = "bottom") +
   scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") + 
   geom_hline(aes(yintercept=0))
-  
+
 p + geom_point(
   data = df,
   mapping = aes(x = as.Date(date), y = resid, color = forecast)
 ) + labs(caption = cap) + 
   geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
   geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
-```
-
-\pagebreak
+ggsave(
+  "hawkes_vs_rec_14.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
 
 # Hawkes vs Recursive 21-Day Residual Plot
 
-```{r,warning=FALSE}
+fig <- fig + 1
 cap <- paste0("Residual plot of Hawkes and Recursive 21-day models")
 h21 <- single_forecast(hdates, hpreds, days = 21)$results
 r21 <- single_forecast(rdates, rpreds, days = 21)$results
@@ -168,23 +225,21 @@ p <- ggplot(
   theme(plot.caption = element_text(hjust = 0.5), legend.position = "bottom") +
   scale_x_date(date_breaks = "5 months", date_labels = "%b-%y") + 
   geom_hline(aes(yintercept=0))
-  
+
 p + geom_point(
   data = df,
   mapping = aes(x = as.Date(date), y = resid, color = forecast)
 ) + labs(caption = cap) + 
   geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
   geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
-```
-
-\pagebreak
-
-
-
+ggsave(
+  "hawkes_vs_rec_21.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
 
 # Hawkes-Only Residual Plot
-
-```{r,warning=F}
+fig <- fig + 1
 cap <- paste0("Residual plot of Hawkes 7-, 14-, and 21-day models")
 p + labs(caption = cap) + 
   geom_point(
@@ -206,13 +261,15 @@ p + labs(caption = cap) +
     guide = "legend"
   ) + geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
   geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
-```
-
-\pagebreak
+ggsave(
+  "hawkes_resids.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
+)
 
 # Recursive-Only Residual Plot
+fig <- fig + 1
 
-```{r,warning=F}
 cap <- paste0("Residual plot of Recursive 7-, 14-, and 21-day models")
 
 p + labs(caption = cap) + 
@@ -235,89 +292,9 @@ p + labs(caption = cap) +
     guide = "legend"
   ) + geom_vline(aes(xintercept = as.Date("2018-09-04")), col = "grey46") +
   geom_vline(aes(xintercept = as.Date("2019-08-25")), col = "grey46")
-```
-
-\pagebreak
-
-# RMSE Calculation During Outbreak
-
-
-```{r, actual case count}
-beg <- actual[as.Date(actual$date) <= as.Date("2018-09-04"),]
-mid <- actual[(as.Date(actual$date) > as.Date("2018-09-04")) & (as.Date(actual$date) <= as.Date("2019-08-25")),]
-end <- actual[as.Date(actual$date) >= as.Date("2019-08-26"),]
-```
-
-```{r, Hawkes}
-hproj_beg <- hproj[as.Date(hproj$date_last_case) <= as.Date("2018-09-04"),]
-hproj_mid <- hproj[(as.Date(hproj$date_last_case) > as.Date("2018-09-04")) & (as.Date(hproj$date_last_case) <= as.Date("2019-08-25")),]
-hproj_end <- hproj[as.Date(hproj$date_last_case) >= as.Date("2019-08-26"),]
-```
-
-```{r, Recursive}
-rproj_beg <- rproj[as.Date(rproj$date_last_case) <= as.Date("2018-09-04"),]
-rproj_mid <- rproj[(as.Date(rproj$date_last_case) > as.Date("2018-09-04")) & (as.Date(rproj$date_last_case) <= as.Date("2019-08-25")),]
-rproj_end <- rproj[as.Date(rproj$date_last_case) >= as.Date("2019-08-26"),]
-```
-
-
-## RMSE Calculation
-
-The table below shows the RMSE values from both the Hawkes and Recursive models during the beginning, middle, and end of the outbreak. The dates for each section are defined in section [1](#setup).
-
-
-```{r}
-cap <- paste0("7-Day Hawkes and Recursive RMSE values during the outbreak")
-rmse_df <- data.frame(
-  Hawkes = c(
-    forecast_rmse(hproj_beg$date_last_case, t(hproj_beg[,2:4]), days = 7),
-    forecast_rmse(hproj_mid$date_last_case, t(hproj_mid[,2:4]), days = 7),
-    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 7)
-  ),
-  Recursive = c(
-    forecast_rmse(rproj_beg$date_last_case, t(rproj_beg[,2:4]), days = 7),
-    forecast_rmse(rproj_mid$date_last_case, t(rproj_mid[,2:4]), days = 7),
-    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 7)   
-  )
+ggsave(
+  "rec_resids.jpg", 
+  path = "/Users/andyshen/Desktop/Git/Ebola-Forecasting/Post Outbreak/Images",
+  width = 5.5, height = 5.5, units = "in"
 )
-rownames(rmse_df) <- c("Beginning","Middle","End")
-rmse_df %>% kable(digits = 3, caption = cap)
-```
 
-```{r}
-cap <- paste0("14-Day Hawkes and Recursive RMSE values during the outbreak")
-rmse_df <- data.frame(
-  Hawkes = c(
-    forecast_rmse(hproj_beg$date_last_case, t(hproj_beg[,2:4]), days = 14),
-    forecast_rmse(hproj_mid$date_last_case, t(hproj_mid[,2:4]), days = 14),
-    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 14)
-  ),
-  Recursive = c(
-    forecast_rmse(rproj_beg$date_last_case, t(rproj_beg[,2:4]), days = 14),
-    forecast_rmse(rproj_mid$date_last_case, t(rproj_mid[,2:4]), days = 14),
-    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 14)   
-  )
-)
-rownames(rmse_df) <- c("Beginning","Middle","End")
-rmse_df %>% kable(digits = 3, caption = cap)
-```
-
-```{r}
-cap <- paste0("21-Day Hawkes and Recursive RMSE values during the outbreak")
-rmse_df <- data.frame(
-  Hawkes = c(
-    forecast_rmse(hproj_beg$date_last_case, t(hproj_beg[,2:4]), days = 21),
-    forecast_rmse(hproj_mid$date_last_case, t(hproj_mid[,2:4]), days = 21),
-    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 21)
-  ),
-  Recursive = c(
-    forecast_rmse(rproj_beg$date_last_case, t(rproj_beg[,2:4]), days = 21),
-    forecast_rmse(rproj_mid$date_last_case, t(rproj_mid[,2:4]), days = 21),
-    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 21)   
-  )
-)
-rownames(rmse_df) <- c("Beginning","Middle","End")
-rmse_df %>% kable(digits = 3, caption = cap)
-```
-
-It is clear that both models are most accurate in the beginning and end of the pandemic as opposed to the middle portion.
