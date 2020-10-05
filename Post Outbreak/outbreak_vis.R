@@ -15,13 +15,7 @@ add_14 <- function(x) {x + 14} #adding on 14 days
 add_21 <- function(x) {x + 21} #adding on 21 days
 add_weeks <- function(x) {x + c(7,14,21)} #adds 7, 14 and 21 days to each date
 
-
-# NOTE TO ANDY: we should have one seperate function for RMSE here
-# and then use this throughout the code so we don't have the same 
-# calculation typed over and over again
-# also, here is where we can include a note of why we aren't using the 
-# pre-exisiting function, rmse, rather than within another function later on
-
+# define the RMSE function to be used later on 
 my_rmse <- function(v){
   # Function that calculates and returns the Root Mean Squared Error
   # omitting any NA's from the input vector, v
@@ -290,7 +284,6 @@ forecast_rmse <- function(date_vec, forecast_mat, days = 21, data = actual) {
   #                 (matrix must be in that order)
   #   days: number of forecasted days to visualize (valid inputs are 7, 14, or 21)
   #   data: a dataframe of the actual case count
-  #         (NOTE TO ANDY: can we change this to "actual" instead of "true"?)
   #
   # Returns:
   #   RMSE: the RMSE for the dataset
