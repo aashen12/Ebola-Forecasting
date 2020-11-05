@@ -274,15 +274,17 @@ rmse_df <- data.frame(
   Hawkes = c(
     forecast_rmse(hproj_beg$date_last_case, t(hproj_beg[,2:4]), days = 7),
     forecast_rmse(hproj_mid$date_last_case, t(hproj_mid[,2:4]), days = 7),
-    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 7)
+    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 7),
+    forecast_rmse(hproj$date_last_case, t(hproj[,2:4]), days = 7)
   ),
   Recursive = c(
     forecast_rmse(rproj_beg$date_last_case, t(rproj_beg[,2:4]), days = 7),
     forecast_rmse(rproj_mid$date_last_case, t(rproj_mid[,2:4]), days = 7),
-    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 7)   
+    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 7),
+    forecast_rmse(rproj$date_last_case, t(rproj[,2:4]), days = 7)
   )
 )
-rownames(rmse_df) <- c("Beginning","Middle","End")
+rownames(rmse_df) <- c("Beginning","Middle","End","Total")
 rmse_df %>% kable(digits = 3, caption = cap)
 ```
 
@@ -292,15 +294,17 @@ rmse_df <- data.frame(
   Hawkes = c(
     forecast_rmse(hproj_beg$date_last_case, t(hproj_beg[,2:4]), days = 14),
     forecast_rmse(hproj_mid$date_last_case, t(hproj_mid[,2:4]), days = 14),
-    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 14)
+    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 14),
+    forecast_rmse(hproj$date_last_case, t(hproj[,2:4]), days = 14)
   ),
   Recursive = c(
     forecast_rmse(rproj_beg$date_last_case, t(rproj_beg[,2:4]), days = 14),
     forecast_rmse(rproj_mid$date_last_case, t(rproj_mid[,2:4]), days = 14),
-    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 14)   
+    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 14),
+    forecast_rmse(rproj$date_last_case, t(rproj[,2:4]), days = 14)
   )
 )
-rownames(rmse_df) <- c("Beginning","Middle","End")
+rownames(rmse_df) <- c("Beginning","Middle","End","Total")
 rmse_df %>% kable(digits = 3, caption = cap)
 ```
 
@@ -310,15 +314,17 @@ rmse_df <- data.frame(
   Hawkes = c(
     forecast_rmse(hproj_beg$date_last_case, t(hproj_beg[,2:4]), days = 21),
     forecast_rmse(hproj_mid$date_last_case, t(hproj_mid[,2:4]), days = 21),
-    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 21)
+    forecast_rmse(hproj_end$date_last_case, t(hproj_end[,2:4]), days = 21),
+    forecast_rmse(hproj$date_last_case, t(hproj[,2:4]), days = 21)
   ),
   Recursive = c(
     forecast_rmse(rproj_beg$date_last_case, t(rproj_beg[,2:4]), days = 21),
     forecast_rmse(rproj_mid$date_last_case, t(rproj_mid[,2:4]), days = 21),
-    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 21)   
+    forecast_rmse(rproj_end$date_last_case, t(rproj_end[,2:4]), days = 21),
+    forecast_rmse(rproj$date_last_case, t(rproj[,2:4]), days = 21)
   )
 )
-rownames(rmse_df) <- c("Beginning","Middle","End")
+rownames(rmse_df) <- c("Beginning","Middle","End","Total")
 rmse_df %>% kable(digits = 3, caption = cap)
 ```
 
