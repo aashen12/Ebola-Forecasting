@@ -204,6 +204,7 @@ mod$plot
 
 # extract the 3-week RMSE
 rmse_r21 <- mod$rmse
+mod$results
 ```
 
 Similar to the 14-day forecasts, the 21-day Recursive forecasts tend to under-predict the actual case counts in the beginning and middle of the pandemic, but is more accurate towards the end of the pandemic with slight over-prediction.
