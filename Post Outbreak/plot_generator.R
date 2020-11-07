@@ -39,7 +39,7 @@ rownames(hproj) <- 1:nrow(hproj)
 hdates <- as.character(hproj$date_last_case) #for working with dates
 hpreds <- t(hproj %>% select(pred.7,pred.14,pred.21)) #take t() for the function
 
-dim <- 4
+dim <- 3.7
 
 fig <- 1 # for numbering the figures in the plots
 # create the plot
